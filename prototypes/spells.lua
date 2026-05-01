@@ -1,7 +1,16 @@
--- Wand + spells. Each spell is a thrown capsule with a placeholder
--- damage / explosion effect; "turn to stone" semantics for Petrificus is
--- TBD pending a proper script handler — current implementation is heavy
--- physical damage as a stand-in.
+-- Wand + spells.
+--   - hmfea-wand: flavor item, gates the spell branch via tech prerequisites.
+--   - hmfea-spell-petrificus-totalus: thrown capsule. Action chain emits an
+--     explosion plus a script trigger ("hmfea-petrify") that script/petrificus.lua
+--     handles by moving caught players into a permission-group lockdown and
+--     issuing a stop command to caught units.
+--   - hmfea-spell-abra-kadabra: use-on-self capsule (via spell_self_capsule).
+--     Detonates a radius-25 nuke-style explosion centred on the caster
+--     regardless of cursor aim.
+--   - hmfea-spell-avada-kedavra: thrown capsule with a single targeted electric
+--     strike. Tesla-turret-bolt visuals are tracked in design.md "Immediate
+--     rework" — current implementation is generic electric area damage as a
+--     placeholder.
 local Placeholder = require("prototypes.placeholder")
 
 -- Wand is a flavor item gating the spell branch via tech prerequisites.
@@ -84,9 +93,10 @@ local function spell_self_capsule(name, target_effects, cooldown)
 end
 
 -- Petrificus Totalus: fires a script trigger at the throw point. Handler
--- in script/petrificus.lua finds entities in a small radius and permanently
--- immobilises them (god controller for player characters, stop-command
--- for units).
+-- in script/petrificus.lua finds entities in a 2.5-tile radius and
+-- permanently immobilises them — players are moved into the
+-- hmfea-petrified-player permission group (denylist on start_walking,
+-- begin_mining, craft) and units get a stop-command at uint32_max.
 local petrificus_effects = {
     { type = "create-entity", entity_name = "explosion" },
     {
@@ -95,8 +105,9 @@ local petrificus_effects = {
     },
 }
 
--- Abra Kadabra: nuke-style explosion centred on the throw point. Player
--- caster usually targets their own feet; we don't enforce that.
+-- Abra Kadabra: nuke-style explosion centred on the caster. Wired through
+-- spell_self_capsule (use-on-self), so the explosion always lands on the
+-- caster regardless of cursor aim.
 local kadabra_effects = {
     { type = "create-entity", entity_name = "big-explosion" },
     { type = "create-entity", entity_name = "big-explosion" },
