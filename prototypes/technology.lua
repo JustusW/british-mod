@@ -44,4 +44,80 @@ data:extend({
             { type = "unlock-recipe", recipe = "hmfea-mr-blobby" },
         },
     },
+    -- Wand + Spells branch.
+    {
+        type = "technology",
+        name = "hmfea-yer-a-wizard-arry",
+        icon = Placeholder.icon_path(),
+        icon_size = 64,
+        prerequisites = { "automation" },
+        unit = {
+            count = 100,
+            ingredients = {
+                { "automation-science-pack", 1 },
+                { "logistic-science-pack",   1 },
+            },
+            time = 30,
+        },
+        effects = {
+            { type = "unlock-recipe", recipe = "hmfea-wand" },
+        },
+    },
+    {
+        type = "technology",
+        name = "hmfea-spell-petrificus-totalus",
+        icon = Placeholder.icon_path(),
+        icon_size = 64,
+        prerequisites = { "hmfea-yer-a-wizard-arry" },
+        unit = {
+            count = 200,
+            ingredients = {
+                { "automation-science-pack", 1 },
+                { "logistic-science-pack",   1 },
+            },
+            time = 30,
+        },
+        effects = {
+            { type = "unlock-recipe", recipe = "hmfea-spell-petrificus-totalus" },
+        },
+    },
+    {
+        type = "technology",
+        name = "hmfea-spell-abra-kadabra",
+        icon = Placeholder.icon_path(),
+        icon_size = 64,
+        prerequisites = { "hmfea-spell-petrificus-totalus" },
+        unit = {
+            count = 400,
+            ingredients = {
+                { "automation-science-pack", 1 },
+                { "logistic-science-pack",   1 },
+                { "chemical-science-pack",   1 },
+            },
+            time = 30,
+        },
+        effects = {
+            { type = "unlock-recipe", recipe = "hmfea-spell-abra-kadabra" },
+        },
+    },
+    {
+        type = "technology",
+        name = "hmfea-spell-avada-kedavra",
+        icon = Placeholder.icon_path(),
+        icon_size = 64,
+        prerequisites = { "hmfea-spell-abra-kadabra" },
+        unit = {
+            count = 600,
+            ingredients = {
+                { "automation-science-pack", 1 },
+                { "logistic-science-pack",   1 },
+                { "chemical-science-pack",   1 },
+                { "military-science-pack",   1 },
+            },
+            time = 30,
+        },
+        effects = {
+            { type = "unlock-recipe", recipe = "hmfea-spell-avada-kedavra" },
+        },
+    },
 })
