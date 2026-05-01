@@ -5,6 +5,7 @@ local Pistol = require("script.pistol")
 local Exoskeleton = require("script.exoskeleton")
 local TowerOfLondon = require("script.tower-of-london")
 local Cravings = require("script.cravings")
+local Truthbomb = require("script.truthbomb")
 
 script.on_init(function()
     Medkit.on_init()
@@ -45,4 +46,8 @@ end)
 
 script.on_event(defines.events.on_player_main_inventory_changed, function(event)
     TowerOfLondon.on_player_main_inventory_changed(event)
+end)
+
+script.on_event(defines.events.on_script_trigger_effect, function(event)
+    Truthbomb.on_script_trigger_effect(event)
 end)
