@@ -4,4 +4,5 @@
 -- from sibling files always returns the same memoised module.
 require("prototypes.placeholder")
 require("prototypes.items")
+require("prototypes.weapons")
 require("prototypes.recipes")
