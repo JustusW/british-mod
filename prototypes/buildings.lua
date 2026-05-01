@@ -25,7 +25,7 @@ local function make_machine(name, category, energy)
         energy_source = {
             type = "electric",
             usage_priority = "secondary-input",
-            emissions_per_minute = { pollution = 1 },
+            emissions_per_minute = { pollution = 0 },
         },
         energy_usage = energy or "100kW",
         graphics_set = {

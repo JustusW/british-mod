@@ -39,7 +39,7 @@ When a prototype's final art isn't ready, the icon / sprite **must** point at th
   - `checkerboard-256.png` — 256×256, entity picture / animation use.
 - **Pattern**: 8×8-pixel checker (scaled to file resolution) of `#FFFFFF` (white) and `#BF00FF` (bright purple). Distinct from Factorio's own missing-texture magenta/black so "explicitly placeholder" is visually separate from "engine couldn't load this".
 - **Reference paths**: `__hmfea__/graphics/placeholder/checkerboard-64.png` for icons; `__hmfea__/graphics/placeholder/checkerboard-256.png` for sprites.
-- **Helper**: `prototypes/placeholder.lua` exports a small data-stage helper `Placeholder.icon()` and `Placeholder.picture(size)` returning ready-to-paste sprite definition tables, so prototype authors don't hand-roll paths and we can swap the asset in one place.
+- **Helper**: `prototypes/placeholder.lua` exports three data-stage helpers — `Placeholder.icon_path()` returns the 64×64 icon path string; `Placeholder.picture(size)` returns a Sprite definition table (defaults to 256, falls back to the 64 file when `size <= 64`); `Placeholder.animation(size)` returns a single-frame Animation definition (same fallback). Prototype authors call these instead of hand-rolling paths so we can swap the asset in one place.
 - **Release check**: a prototype using the placeholder is implicitly **TBD on art**. Before each release, `grep -ri "graphics/placeholder/" prototypes/` (or the equivalent) should match nothing for implemented features. Treat any placeholder reference as a release-blocking TODO.
 - **Subsystem log**: when a placeholder is encountered at runtime by an asset-aware code path (e.g., a feature that snapshots prototype state), it may emit a `[placeholder] tick=N event=in_use prototype=<name>` line via `Log.debug` to surface stragglers.
 
@@ -188,7 +188,7 @@ The Wand + Spells branch is implemented as new `hmfea-` prototypes. The Wand its
 
 - `hmfea-wand` — `type = "item"`, flavor only. Recipe gated by the **Yer'a Wizard 'Arry** tech.
 - `hmfea-spell-petrificus-totalus` — capsule, `type = "throw"`, `range = 25`. Action chain emits a `[create-entity]` explosion plus a `script` trigger with `effect_id = "hmfea-petrify"`.
-- `hmfea-spell-abra-kadabra` — capsule, `type = "throw"`, `range = 25`. Two `big-explosion` create-entity effects + a `radius = 25` area dealing `5000` explosion damage. Aim the throw point at your own feet for the canonical "centred on the player" experience.
+- `hmfea-spell-abra-kadabra` — capsule, `type = "use-on-self"` so the explosion always lands on the caster regardless of cursor aim (matches the "centred on the player" requirement). Two `big-explosion` create-entity effects + a `radius = 25` area dealing `5000` explosion damage at the caster's position. Built via the dedicated `spell_self_capsule()` helper in `prototypes/spells.lua`.
 - `hmfea-spell-avada-kedavra` — capsule, `type = "throw"`, `range = 35`. Single targeted electric strike, `radius = 1.0` area dealing `1500` electric damage.
 
 ### Research — `prototypes/technology.lua`
@@ -210,7 +210,7 @@ Permanently disables movement of the target. Triggered when the `hmfea-petrify` 
 
 - **Yer'a Wizard 'Arry** → unlocks **Wand** (item). Gates the spell branch (see "Spells").
 - **Philosopher's Stone** — gates Tank recipe.
-- **Mr. Blobby** — late-game tech, unlocks a Mr. Blobby capsule / rocket payload. **Runtime-global** setting `hmfea-enable-mr-blobby` (default **on**) toggles whether the tech must be researched normally or is auto-granted on prerequisite completion — see "Win condition". The **You Whimp** achievement fires from `on_runtime_mod_setting_changed` when this setting flips from `true` → `false` while a game is in progress; the achievement does **not** trigger if the player picks `false` before starting a save (no setting-change event fires in that path).
+- **Mr. Blobby** — late-game tech, unlocks the Mr. Blobby rocket payload. **Runtime-global** setting `hmfea-enable-mr-blobby` (default **on**) toggles whether the tech must be researched normally or is auto-granted on prerequisite completion — see "Win condition". The **You Whimp** achievement fires from `on_runtime_mod_setting_changed` when this setting flips from `true` → `false` while a game is in progress; the achievement does **not** trigger if the player picks `false` before starting a save (no setting-change event fires in that path).
 - **Truthbomb** — final research before the Rocket Silo prerequisite chain.
 
 ## Win condition
@@ -284,6 +284,12 @@ Storage layout is versioned via `storage.schema_version`. The framework lives in
 Current version: `0` (baseline). No migrations registered yet.
 
 When a feature module changes its storage shape, the change goes through this framework so saves persisted under older mod versions get upgraded silently on load.
+
+## Immediate rework
+
+Items that don't satisfy requirements yet but are accepted as known gaps. Tackle en bloc when the queue is large enough to justify a focused pass. **Append; never silently delete** — items move out only by being implemented or by an explicit requirements change that retires them.
+
+- **Avada Kedavra → Tesla turret bolt visuals + projectile.** Requirements (Research → Spells) call for "fires a Tesla turret bolt." The Tesla turret prototype lives in the Space Age expansion; this mod ships with `! space-age`. Plan: extract the relevant Tesla projectile, beam, and impact prototypes from Space Age (and any sound/animation assets), copy them into `prototypes/spells.lua` (or a sibling file) under `hmfea-` names, and rewire the Avada Kedavra capsule to fire a single shot of the new projectile. Until then the spell uses generic electric area damage as a placeholder.
 
 ## Non-goals
 

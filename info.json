@@ -2,7 +2,7 @@
     "name": "hmfea",
     "version": "0.0.1",
     "title": "His Majesty's Factory Expansion Act",
-    "author": "mission_factorio1",
+    "author": "Justus & Mission",
     "factorio_version": "2.0",
     "dependencies": ["base >= 2.0", "! space-age"],
     "description": "Perchance the most quintessentially British mod in the annals of existence.\n\nMade with love from Germany and South Africa <3",
