@@ -100,7 +100,7 @@ The visible tech tree leans into British memes, gating absurd capabilities behin
 
 Every player runs a three-stage debuff cycle from the first tick. Eating Cuppa Tea or Fish & Chips resets the cycle to Satiated.
 
-- **Satiated** — duration `3600 ticks × 5–10` (one-minute Factorio ticks × randomised 5–10 multiplier). Ends with a forced random prompt: _Fish & Chips or Cuppa Tea?_
+- **Satiated** — duration **5 minutes base + a random 0–5 minutes on top** (so total 5–10 minutes, randomised per cycle). Ends with a forced random prompt: _Fish & Chips or Cuppa Tea?_
 - **Craving** — duration `3600 ticks` (one minute). Final warning window.
 - **Craven** — infinite. The factory is effectively disabled: a hidden beacon imposes an absurd electricity demand (e.g. 99,999,999,999,999,999) so nothing runs until food is consumed.
 

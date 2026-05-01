@@ -116,7 +116,7 @@ Logs-first approach — when a feature misbehaves we read the log, we don't gues
 ## On-Tick debuff (food cravings)
 
 - Per-player state on `storage.players[index]` tracking `stage`, `stage_started_tick`, and `next_prompt_tick`.
-- Stage timings: Satiated `3600 × randint(5,10)` ticks, Craving `3600` ticks, Craven infinite.
+- Stage timings: Satiated `3600 × 5 + math.random(0, 3600 * 5)` ticks (5 minutes base + 0–5 minutes random), Craving `3600` ticks, Craven infinite.
 - Craven enforcement: a hidden invisible beacon attached to each player's force imposing an absurd electricity demand modifier. Beacon is created on entering Craven, destroyed on eating.
 - Eating Cuppa Tea or Fish & Chips fires `on_player_consumed_item` (or equivalent) and resets stage to Satiated.
 

@@ -10,14 +10,14 @@ data:extend({
         icon_size = 64,
         prerequisites = { "explosives", "military-2" },
         unit = {
-            count = 250,
+            count = 1000,
             ingredients = {
                 { "automation-science-pack", 1 },
                 { "logistic-science-pack",   1 },
                 { "military-science-pack",   1 },
                 { "chemical-science-pack",   1 },
             },
-            time = 60,
+            time = 30,
         },
         effects = {
             { type = "unlock-recipe", recipe = "hmfea-truthbomb" },
@@ -30,7 +30,8 @@ data:extend({
         icon_size = 64,
         prerequisites = { "rocket-silo" },
         unit = {
-            count = 2000,
+            -- Designed for ~1000 SPM × 1 hour grind = 60000 science.
+            count = 60000,
             ingredients = {
                 { "automation-science-pack",  1 },
                 { "logistic-science-pack",    1 },
@@ -38,7 +39,7 @@ data:extend({
                 { "production-science-pack",  1 },
                 { "utility-science-pack",     1 },
             },
-            time = 60,
+            time = 1,
         },
         effects = {
             { type = "unlock-recipe", recipe = "hmfea-mr-blobby" },

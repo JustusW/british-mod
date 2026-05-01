@@ -33,9 +33,10 @@ data:extend({
         enabled = false,  -- unlocked by hmfea-truthbomb research
         energy_required = 30,
         ingredients = {
-            { type = "item", name = "explosives",  amount = 50 },
+            { type = "item", name = "explosives",  amount = 1 },
+            { type = "item", name = "stone",       amount = 1 },  -- as dumb as a rock
             { type = "item", name = "iron-plate",  amount = 100 },
-            { type = "item", name = "engine-unit", amount = 10 },
+            { type = "item", name = "engine-unit", amount = 1 },
         },
         results = { { type = "item", name = "hmfea-truthbomb", amount = 1 } },
     },
@@ -43,11 +44,9 @@ data:extend({
         type = "recipe",
         name = "hmfea-mr-blobby",
         enabled = false,  -- unlocked by hmfea-mr-blobby research (or by setting flip)
-        energy_required = 60,
+        energy_required = 5,
         ingredients = {
-            { type = "item", name = "low-density-structure", amount = 100 },
-            { type = "item", name = "processing-unit",       amount = 200 },
-            { type = "item", name = "plastic-bar",           amount = 500 },
+            { type = "item", name = "stone", amount = 1 },
         },
         results = { { type = "item", name = "hmfea-mr-blobby", amount = 1 } },
     },
