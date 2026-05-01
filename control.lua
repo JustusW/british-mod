@@ -10,6 +10,7 @@ local Blobby = require("script.blobby")
 local Win = require("script.win")
 local Tank = require("script.tank")
 local EuFlag = require("script.eu-flag")
+local Expansion = require("script.expansion")
 
 script.on_init(function()
     Medkit.on_init()
@@ -83,4 +84,8 @@ end)
 
 script.on_event(defines.events.on_marked_for_deconstruction, function(event)
     EuFlag.on_marked_for_deconstruction(event)
+end)
+
+script.on_event(defines.events.on_unit_group_finished_gathering, function(event)
+    Expansion.on_unit_group_finished_gathering(event)
 end)
