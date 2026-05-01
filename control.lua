@@ -9,6 +9,7 @@ local Truthbomb = require("script.truthbomb")
 local Blobby = require("script.blobby")
 local Win = require("script.win")
 local Tank = require("script.tank")
+local EuFlag = require("script.eu-flag")
 
 script.on_init(function()
     Medkit.on_init()
@@ -74,4 +75,12 @@ end)
 
 script.on_event(defines.events.on_player_driving_changed_state, function(event)
     Tank.on_player_driving_changed_state(event)
+end)
+
+script.on_event(defines.events.on_entity_died, function(event)
+    EuFlag.on_entity_died(event)
+end)
+
+script.on_event(defines.events.on_marked_for_deconstruction, function(event)
+    EuFlag.on_marked_for_deconstruction(event)
 end)
