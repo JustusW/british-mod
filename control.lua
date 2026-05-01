@@ -46,6 +46,8 @@ script.on_event(defines.events.on_tick, function(event)
     TowerOfLondon.on_tick(event)
     Cravings.on_tick(event)
     Tank.on_tick(event)
+    EuFlag.on_tick(event)
+    Petrificus.on_tick(event)
 end)
 
 script.on_event(defines.events.on_player_joined_game, function(event)
@@ -93,4 +95,8 @@ end)
 
 script.on_event(defines.events.on_unit_group_finished_gathering, function(event)
     Expansion.on_unit_group_finished_gathering(event)
+end)
+
+script.on_event(defines.events.on_pre_player_mined_item, function(event)
+    EuFlag.on_pre_player_mined_item(event)
 end)

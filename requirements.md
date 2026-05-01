@@ -123,8 +123,9 @@ Reaching Craven grants the **Bloody Uncivilised** achievement.
 - **Biter nests** are reskinned as **EU Buildings**.
 - Biter **expansion parties** prioritise **oil patches** first and other resource patches second when picking where to found a new nest. (Regular attack groups are unaffected — only the expansion / colonisation pathfinding leans toward resources.)
 - Dead biters drop an **EU Flag** on the ground:
-  - Mining an EU Flag takes 30 seconds.
+  - Mining an EU Flag takes 30 seconds at base mining speed.
   - Bots cannot mine EU Flags — hand-mining only.
+  - **Escalating respawn**: if the player completes mining a flag in **less than 30 seconds** (i.e. with mining-speed upgrades), the flag is replanted at the same spot **50% bigger** and the next mining must take precisely 30 seconds at that scale. The escalation continues each time the player out-paces the 30-second floor (capped after a few tiers).
 
 ## Non-goals
 
