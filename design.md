@@ -25,7 +25,7 @@ Single source of truth for player-facing strings. Required for every `hmfea-*` p
   - `[entity-name]` / `[entity-description]` — `hmfea-eu-flag`, future Greenhouse / Woodchipper.
   - `[technology-name]` / `[technology-description]` — `hmfea-truthbomb`, future spell branch, `hmfea-mr-blobby`.
   - `[achievement-name]` / `[achievement-description]` — `hmfea-you-whimp`, `hmfea-bloody-uncivilised`.
-  - `[mod-setting-name]` / `[mod-setting-description]` — `hmfea-debug-logs`, `hmfea-debug-fixtures`, future `hmfea-enable-mr-blobby`.
+  - `[mod-setting-name]` / `[mod-setting-description]` — `hmfea-debug-logs`, `hmfea-debug-fixtures`, `hmfea-enable-mr-blobby`.
   - `[hmfea]` — mod-internal strings used by `localised_name` / `localised_description` overrides on vanilla prototypes (Pis-what-now?) and by runtime flying-text / `game.print` calls. Example keys: `hmfea.pis-what-now-name`, `hmfea.pis-what-now-description`, `hmfea.pillock-rebuke` (= "You uncivilised pillock."), `hmfea.blobby-consolation` (= "Mr. Blobby says: Did you really win?").
 - Runtime strings reach the locale via `{ "hmfea.pillock-rebuke" }` table syntax in `create_local_flying_text`, `game.print`, etc. — never hard-coded English in `control.lua`.
 - A new prototype is incomplete until its locale keys exist in `locale/en/en.cfg`. Treat missing locale as a blocker on the same level as a missing icon.
@@ -42,6 +42,18 @@ When a prototype's final art isn't ready, the icon / sprite **must** point at th
 - **Helper**: `prototypes/placeholder.lua` exports a small data-stage helper `Placeholder.icon()` and `Placeholder.picture(size)` returning ready-to-paste sprite definition tables, so prototype authors don't hand-roll paths and we can swap the asset in one place.
 - **Release check**: a prototype using the placeholder is implicitly **TBD on art**. Before each release, `grep -ri "graphics/placeholder/" prototypes/` (or the equivalent) should match nothing for implemented features. Treat any placeholder reference as a release-blocking TODO.
 - **Subsystem log**: when a placeholder is encountered at runtime by an asset-aware code path (e.g., a feature that snapshots prototype state), it may emit a `[placeholder] tick=N event=in_use prototype=<name>` line via `Log.debug` to surface stragglers.
+
+## Placeholder audio
+
+Mirror of the graphics rule for sound clips. Final audio (the victory jingle, the tank loop, the Truthbomb voice line, spell sounds) is sourced or recorded later; the implementation must surface that an asset is missing rather than ship silence.
+
+- **Substitutes used today**:
+  - **Tank loop** — `script/tank.lua` plays `utility/new_objective` (vanilla utility sound) every 5 seconds while in tank. Loud-and-clearly-not-the-final-clip.
+  - **Truthbomb voice line** — silent. Detonation logs a `[truthbomb]` line; no `play_sound` call is wired yet.
+  - **Victory jingle (`utility-sounds.game_won` override)** — not wired. Vanilla jingle plays.
+  - **Spell sounds** — none.
+- **Release check**: every entry above must be replaced with a real clip before release. The current substitutes are **TBD** for the same reason a checkerboard icon is — they exist to make the gap audible during playtesting.
+- **No helper module yet**: audio paths are referenced inline. If the placeholder set grows, factor a `prototypes/audio_placeholder.lua` helper analogous to `prototypes/placeholder.lua`.
 
 ## Modifying vanilla prototypes
 
@@ -65,15 +77,17 @@ Logs-first approach — when a feature misbehaves we read the log, we don't gues
   | Tag | Status | Log lines |
   |---|---|---|
   | `[medkit]` | **implemented** | `event=used player=<idx> delay_ticks=<D>` on capsule use; `event=heal_fired healed=<count> amount=<HEAL_AMOUNT>` when the heal fires. |
-  | `[craving]` | **implemented** | On-Tick debuff stage transitions (`event=stage_change player=<idx> from=<stage> to=<stage>`); `event=achievement_fired name=hmfea-bloody-uncivilised player=<idx>` on Craven entry. |
-  | `[mr-blobby]` | **implemented** | Runtime setting flips (`event=setting_changed from=<bool> to=<bool>`); `event=achievement_fired name=hmfea-you-whimp` on first true→false flip; auto-grant marked pending (`event=auto_grant_marked force=<idx>`); auto-grant fired (`event=auto_grant_fired force=<idx>`); victory text branch on launch (`event=win_text variant=<standard\|consolation> force=<idx>`). |
+  | `[craving]` | **implemented** | `event=stage_change player=<idx> from=<stage> to=<stage>` on On-Tick debuff transitions; `event=achievement_fired name=hmfea-bloody-uncivilised player=<idx>` on Craven entry; `event=force_shutdown force=<idx> entities=<count>` on first Craven entry per force; `event=force_restored force=<idx> entities=<count>` when no Craven players remain on the force. |
+  | `[mr-blobby]` | **implemented** | `event=setting_changed from=<bool> to=<bool>` on each setting flip; `event=achievement_fired name=hmfea-you-whimp` on first `true → false` flip; `event=auto_grant_marked force=<idx>` when prereqs aren't satisfied yet; `event=auto_grant_fired force=<idx>` when the research is granted; `event=win_text variant=<standard\|consolation> force=<idx>` on a Mr. Blobby launch; `event=win_suppressed force=<idx> reason=<reason>` on a non-Blobby launch (vanilla victory undone). |
   | `[tower-of-london]` | **implemented** | `event=sentenced player=<idx> ticks=<duration>` on spoiled-tea detection; `event=released player=<idx>` on sentence expiry. |
   | `[exoskeleton]` | **implemented** | `event=killed player=<idx>` on each enforced death. |
-  | `[eu-flag]` | **implemented** | Flag spawns (`event=spawned x=<x> y=<y> from=<biter-name>`); blocked robot mining (`event=robot_mining_blocked`). |
-  | `[pistol]` | **implemented** | Blocked Pis-what-now? fire attempts (`event=fire_blocked player=<idx>`). |
-  | `[expansion]` | **implemented** | Biter expansion-party retargets (`event=retarget group=<idx> from=<x,y> to=<x,y> resource=<name>`). |
+  | `[eu-flag]` | **implemented** | `event=spawned x=<x> y=<y> from=<biter-name>` on biter death drop; `event=robot_mining_blocked` when a deconstruction order is cancelled; `event=fast_mine tier_was=<tier> elapsed_ticks=<n> player=<idx>` when a flag is mined under 30 s; `event=respawned tier=<tier> x=<x> y=<y>` when a respawned tier flag lands. |
+  | `[pistol]` | **implemented** | `event=fire_blocked player=<idx>` on each Pis-what-now? shoot attempt that the runtime guard intercepts. |
+  | `[expansion]` | **implemented** | `event=retarget group=<idx> from=<x,y> to=<x,y> resource=<name>` on each biter expansion-party retarget. |
   | `[truthbomb]` | **implemented** | `event=detonated x=<x> y=<y>` when the bomb's script trigger fires. |
   | `[tank]` | **implemented** | `event=mounted player=<idx>` / `event=dismounted player=<idx>` on driving-state changes. |
+  | `[petrificus]` | **implemented** | `event=petrified target=<unit\|player> name=<entity_name> id=<unit_number>` (units) or `event=petrified target=player player=<idx>` when a player is hit. |
+  | `[migration]` | **implemented** | `event=initialised version=<N>` from `Migration.on_init`; `event=running from=<N> to=<N+1>` for each migration step in `on_configuration_changed`. |
   | `[placeholder]` | **TBD** | Optional surfacing of prototypes still wired to placeholder art (`event=in_use prototype=<name>`). |
 
   Add a new subsystem row the moment a feature touches `control.lua`. No untagged log lines.
@@ -94,11 +108,11 @@ Logs-first approach — when a feature misbehaves we read the log, we don't gues
 
 ### Cuppa Tea
 
-- Hand-craft only — recipe is restricted to player crafting (no assembler category).
+- Hand-craft only — recipe `category = "hmfea-hand-only"`, exclusive to the character's `crafting_categories` (added in `prototypes/updates/character.lua`).
 - Spoils via the Factorio 2.0 base-engine spoil mechanic. The Cuppa Tea item prototype sets:
   - `spoil_ticks = 60 * 60 * 5` (5 minutes — placeholder, tune in playtesting).
-  - `spoil_to_trigger_result = { type = "trigger-effect-item", trigger_effect_item = …, ... }` so the spoil event fires a script trigger we listen for in `control.lua` via `defines.events.on_script_trigger_effect` and route to the Tower of London handler. (`spoil_result` alone would just convert the item; `spoil_to_trigger_result` is what gives us the event hook.)
-  - We attribute the trigger to the player who owned the inventory (`event.cause_entity` / `event.source_entity` resolution: walk back to the player whose character holds the inventory the spoil came from). Edge case to nail down in implementation: spoilage in chests / lab inputs vs. a player's pocket — Tower of London only applies to spoils in a player's main / character inventory.
+  - `spoil_result = "hmfea-spoiled-tea"` — the spoiled item is a sentinel that surfaces in the player's inventory the moment the timer elapses.
+- **Detection**: `script/tower-of-london.lua` hooks `on_player_main_inventory_changed`. When `hmfea-spoiled-tea` appears in a player's main inventory, the item is removed and the player is sentenced. The check is naturally scoped to a player's pocket — chests and lab inputs do not fire the event for that player. (No `spoil_to_trigger_result` plumbing — that field's structure varies between Factorio 2.0 builds and the inventory-polling path is reliable across both.)
 - Ingredient sub-recipes: Teacup (Clay), Pot of Tea, Kettle of Boiling Water — see requirements for the tree. Each sub-component gets its own item / recipe prototype.
 
 ### Fish & Chips
@@ -115,10 +129,10 @@ Logs-first approach — when a feature misbehaves we read the log, we don't gues
 
 ## On-Tick debuff (food cravings)
 
-- Per-player state on `storage.players[index]` tracking `stage`, `stage_started_tick`, and `next_prompt_tick`.
+- Per-player state on `storage.cravings.players[player_index]` tracking `stage` (string) and `stage_ends_at` (tick) — the absolute tick when the current stage flips to the next. Craven sets `stage_ends_at = nil` (infinite).
 - Stage timings: Satiated `3600 × 5 + math.random(0, 3600 * 5)` ticks (5 minutes base + 0–5 minutes random), Craving `3600` ticks, Craven infinite.
 - Craven enforcement: when any player on a force enters Craven, every entity on that force whose `type` is `assembling-machine`, `furnace`, `lab`, `rocket-silo`, or `mining-drill` and is currently active is set inactive (factory shutdown). The set of touched entities is stored on `storage.cravings.force_shutdowns[force_index]`. When the last Craven player on the force is satisfied, the same set is restored to active.
-- Eating Cuppa Tea or Fish & Chips fires `on_player_consumed_item` (or equivalent) and resets stage to Satiated.
+- Eating Cuppa Tea or Fish & Chips: `Cravings.on_player_used_capsule` (wired from `control.lua`'s `on_player_used_capsule` dispatcher) checks `event.item.name` against `FOOD_ITEMS = { hmfea-cuppa-tea, hmfea-fish-and-chips }` and resets the player's stage to Satiated.
 
 ## Vehicles & buildings
 
@@ -129,7 +143,7 @@ Logs-first approach — when a feature misbehaves we read the log, we don't gues
 
 ## Equipment
 
-- **Exoskeleton** — death triggers from a single helper `enforce_no_exoskeleton(player)` that scans the armor grid and, if any exoskeleton equipment is present, kills the player and prints the flavor line. The helper is called from:
+- **Exoskeleton** — death triggers from a private helper inside `script/exoskeleton.lua` that scans the armor grid and, if any exoskeleton equipment is present, kills the player and prints the flavor line. The helper is called from:
   - `on_player_armor_inventory_changed` — catches live equips.
   - `on_player_joined_game` — catches save loads where the equipment was already in the grid (the inventory-changed event does not fire on load).
   - `on_init` and `on_configuration_changed` — iterate `game.connected_players` and apply the helper, so adding the mod to an existing save retroactively enforces the rule.
@@ -155,7 +169,7 @@ Listed in tech-unlock order, matched to `requirements.md`. Mix of new `hmfea-` p
 
 ### Tier 3 — Truthbomb research (final tech before Rocket Silo)
 
-- **Truthbomb (NHS Double Decker Bus)** — **new** prototype `hmfea-truthbomb` (capsule). New research `hmfea-truthbomb` is added to the tech tree as the prerequisite of `rocket-silo`. Detonation produces a large explosion via `on_script_trigger_effect` and plays the Michael Caine line.
+- **Truthbomb (NHS Double Decker Bus)** — **new** prototype `hmfea-truthbomb` (capsule). New research `hmfea-truthbomb` is added to the tech tree as the prerequisite of `rocket-silo`. Detonation produces a radius-12 area explosion via `on_script_trigger_effect`. The Michael Caine voice line is **TBD** pending a sound asset (see "Placeholder audio") — `script/truthbomb.lua` currently only logs the trigger.
 
 Vanilla recipes / techs that the mutations target are kept enabled — these are reskins / retunes, not deletions. No `disable-recipe` or hidden-tech surgery is required.
 
@@ -174,21 +188,46 @@ Vanilla recipes / techs that the mutations target are kept enabled — these are
 - `energy_required = 1800` (30 minutes at 1× speed), `ingredients = {}` (free).
 - Single result: 1 `hmfea-medkit`.
 
-### Behaviour — `control.lua`
+### Behaviour — `script/medkit.lua`
 
-- `prepare_storage()` ensures `storage` exists and seeds `storage.healing_tick = -1` (sentinel: idle / no heal pending). Idempotent.
-- `script.on_init` calls `prepare_storage()`.
-- `script.on_configuration_changed` calls `prepare_storage()` so a save that pre-dates this mod (or pre-dates the `healing_tick` field) gets the field added without crashing on first medkit use.
+- A private `init_storage()` helper ensures `storage` exists and seeds `storage.healing_tick = -1` (sentinel: idle / no heal pending). Idempotent.
+- `Medkit.on_init` and `Medkit.on_configuration_changed` (both wired from `control.lua`'s respective dispatchers) call `init_storage()` so saves that pre-date the field get it added without crashing on first medkit use.
 - On `on_player_used_capsule` for `hmfea-medkit`: `storage.healing_tick = math.random(1800, 7200)` ticks → **30–120 seconds** of delay before the heal fires. Using a medkit while a heal is already queued **resets** the timer (single global heal, by design — see requirements.md).
 - On `on_tick`: if `storage.healing_tick < 0` the handler returns immediately (no work in the idle case). When the counter is `>= 0` it counts down; when it hits `0` every player in `game.players` with a character is healed by `HEAL_AMOUNT` (`character.damage(-HEAL_AMOUNT, force)`) and the counter is reset to `-1`.
-- Heal magnitude: `HEAL_AMOUNT = 2000` is a top-of-file constant in `control.lua` (above `prepare_storage`). Vanilla character max HP is 250, so any large negative value caps to full health on any reasonable build — treat 2000 as a sentinel meaning "full heal", not a literal HP number.
+- Heal magnitude: `HEAL_AMOUNT = 2000` is a module-local constant at the top of `script/medkit.lua`. Vanilla character max HP is 250, so any large negative value caps to full health on any reasonable build — treat 2000 as a sentinel meaning "full heal", not a literal HP number.
 - Telemetry: emits `[medkit] tick=N event=used player=<idx> delay_ticks=<D>` on capsule use and `[medkit] tick=N event=heal_fired healed=<count> amount=<HEAL_AMOUNT>` when the heal fires, both via `Log.debug` (see "Telemetry").
+
+## Spells
+
+The Wand + Spells branch is implemented as new `hmfea-` prototypes. The Wand itself is a flavor item (no behaviour); the spells are thrown capsules with placeholder explosion / damage effects.
+
+### Prototypes — `prototypes/spells.lua`
+
+- `hmfea-wand` — `type = "item"`, flavor only. Recipe gated by the **Yer'a Wizard 'Arry** tech.
+- `hmfea-spell-petrificus-totalus` — capsule, `type = "throw"`, `range = 25`. Action chain emits a `[create-entity]` explosion plus a `script` trigger with `effect_id = "hmfea-petrify"`.
+- `hmfea-spell-abra-kadabra` — capsule, `type = "throw"`, `range = 25`. Two `big-explosion` create-entity effects + a `radius = 25` area dealing `5000` explosion damage. Aim the throw point at your own feet for the canonical "centred on the player" experience.
+- `hmfea-spell-avada-kedavra` — capsule, `type = "throw"`, `range = 35`. Single targeted electric strike, `radius = 1.0` area dealing `1500` electric damage.
+
+### Research — `prototypes/technology.lua`
+
+Chain: `automation` → `hmfea-yer-a-wizard-arry` (unlocks `hmfea-wand`) → `hmfea-spell-petrificus-totalus` → `hmfea-spell-abra-kadabra` → `hmfea-spell-avada-kedavra`. Cost climbs by tier.
+
+### Petrificus Totalus runtime — `script/petrificus.lua`
+
+Permanently disables movement of the target. Triggered when the `hmfea-petrify` script effect fires from the spell capsule.
+
+- **Hit selection**: `Petrificus.on_script_trigger_effect` reads `event.target_position` (or `source_position`) and `event.surface_index`, then `surface.find_entities` over a `2.5`-tile box around that point.
+- **Per entity**:
+  - `entity.type == "character"` — find the owning player (linear scan over `game.players` matching `p.character == entity`). Switch the player to the god controller (`player.set_controller{ type = defines.controllers.god }`), kill the character entity. Storage flag `storage.petrificus.players[player_index] = true` so the god-controller stick re-applies on rejoin (`Petrificus.on_player_joined_game`).
+  - `entity.type == "unit"` — issue `set_command{ type = defines.command.stop, ticks_to_wait = 4_294_967_295, distraction = defines.distraction.none }`. Storage flag `storage.petrificus.units[unit_number] = true`. The stop command holds for the unit's lifetime; an idle `Petrificus.on_tick` re-issue hook is reserved (currently a no-op) for cases where a group steals the command back.
+- **Locale**: target player gets `hmfea.petrified-player` printed to chat ("Petrificus Totalus. You'll be playing from radar. Hope you have robots.").
+- **Telemetry**: `[petrificus]` — see Subsystems table.
 
 ## Research
 
-- **Yer'a Wizard 'Arry** → unlocks **Wand** (gun prototype). Spell branch unlocks individual spell capsules (Petrificus Totalus, Abra Kadabra, Avada Kedavra).
+- **Yer'a Wizard 'Arry** → unlocks **Wand** (item). Gates the spell branch (see "Spells").
 - **Philosopher's Stone** — gates Tank recipe.
-- **Mr. Blobby** — late-game tech, unlocks a Mr. Blobby capsule / rocket payload. **Runtime-global** setting `hmfea-enable-mr-blobby` (default **on**) toggles whether the tech must be researched normally or is auto-granted on prerequisite completion — see "Win condition". The **You Whimp** achievement fires from `on_runtime_mod_setting_changed` when this setting flips from `true` → `false` while a game is in progress; the achievement does **not** trigger if the player picks `false` before starting a save (no setting-change event fires in that path). Setting prototype must be added to `settings.lua` when implemented.
+- **Mr. Blobby** — late-game tech, unlocks a Mr. Blobby capsule / rocket payload. **Runtime-global** setting `hmfea-enable-mr-blobby` (default **on**) toggles whether the tech must be researched normally or is auto-granted on prerequisite completion — see "Win condition". The **You Whimp** achievement fires from `on_runtime_mod_setting_changed` when this setting flips from `true` → `false` while a game is in progress; the achievement does **not** trigger if the player picks `false` before starting a save (no setting-change event fires in that path).
 - **Truthbomb** — final research before the Rocket Silo prerequisite chain.
 
 ## Win condition
@@ -197,10 +236,10 @@ The win path is always the same: launch a Mr. Blobby payload via the rocket silo
 
 - **Setting on (default)**: the Mr. Blobby tech is researched normally — vanilla research mechanics, no script involvement.
 - **Setting off** (chosen at game start or flipped during the run): the Mr. Blobby research is **auto-granted** the moment its prerequisites are fulfilled. Implementation:
-  - Hook `on_runtime_mod_setting_changed` on `hmfea-enable-mr-blobby`. When the new value is `false`, check each force's `technologies["hmfea-mr-blobby"].prerequisites_satisfied`. If satisfied, set `technologies["hmfea-mr-blobby"].researched = true`. If not yet satisfied, mark `storage.blobby_pending_auto_grant[force_index] = true` and watch `on_research_finished` to grant the moment the last prereq lands.
+  - Hook `on_runtime_mod_setting_changed` on `hmfea-enable-mr-blobby`. When the new value is `false`, check each force's `technologies["hmfea-mr-blobby"].prerequisites_satisfied`. If satisfied, set `technologies["hmfea-mr-blobby"].researched = true`. If not yet satisfied, mark `storage.blobby.pending_auto_grant[force.index] = true` and watch `on_research_finished` to grant the moment the last prereq lands.
   - On `on_init` and `on_configuration_changed`, run the same satisfaction check for every force using the current setting value (covers fresh saves with the setting already off and mod-update cases).
-- **Sticky**: once the auto-grant has fired, `storage.blobby_auto_granted[force_index] = true`. Set on the same tick as the `researched = true` flip. The grant cannot be reverted; Factorio has no clean "un-research" path and we deliberately do not provide one. Re-enabling the setting later just stops *future* prereq completions from auto-granting (irrelevant after the fact, since the tech is already researched).
-- **Victory text + state**: on `on_rocket_launched` with the Blobby payload, if `storage.blobby_auto_granted[force_index]` is true the rendered text is the consolation `{ "hmfea.blobby-consolation" }` (= "Mr. Blobby says: Did you really win?"); otherwise the standard victory text fires. The handler then calls `game.set_game_state{ game_finished = true, player_won = true, victorious_force = force, can_continue = true }` to confirm victory.
+- **Sticky**: once the auto-grant has fired, `storage.blobby.auto_granted[force.index] = true`. Set on the same tick as the `researched = true` flip. The grant cannot be reverted; Factorio has no clean "un-research" path and we deliberately do not provide one. Re-enabling the setting later just stops *future* prereq completions from auto-granting (irrelevant after the fact, since the tech is already researched).
+- **Victory text + state**: on `on_rocket_launched` with the Blobby payload, if `storage.blobby.auto_granted[force.index]` is true the rendered text is the consolation `{ "hmfea.blobby-consolation" }` (= "Mr. Blobby says: Did you really win?"); otherwise the standard victory text fires. The handler then calls `game.set_game_state{ game_finished = true, player_won = true, victorious_force = force, can_continue = true }` to confirm victory.
 - **Vanilla-victory suppression**: when a rocket launches **without** the Blobby payload, the handler calls `game.set_game_state{ game_finished = false, player_won = false, can_continue = true }` to undo any vanilla victory state and prints `hmfea.win-suppressed` to the force. This makes Mr. Blobby the only acknowledged win condition.
 - **Audio is unchanged in both cases** — the victory jingle replacement applies to either path.
 - Telemetry: see the `[mr-blobby]` row in the Telemetry table for the events emitted.
@@ -209,9 +248,11 @@ The **You Whimp** achievement is wired separately (see Achievements). Trigger is
 
 ## Audio
 
-- Override base `utility-sounds.game_won` with the _"Fuck this Shit I'm Out"_ clip for the victory replacement. `game_lost` is left untouched.
-- Tank sound loop: `on_player_driving_changed_state` starts a per-player `play_sound` loop for the tank.
-- Truthbomb voice line: triggered on detonation.
+All three audio overrides below currently use **placeholder audio** (see "Placeholder audio") — final clips are TBD. The hooks are wired so swapping the asset is a one-line change per feature.
+
+- **Victory jingle**: planned `utility-sounds.game_won` override with the _"Fuck this Shit I'm Out"_ clip. Currently unwired — vanilla jingle plays. Add the override in `data-updates.lua` once the asset lands.
+- **Tank loop**: `script/tank.lua` hooks `on_player_driving_changed_state` to mark a player as in-tank, then `on_tick` plays `utility/new_objective` (placeholder vanilla sound) every 5 seconds while in tank. Swap the path to the "God Save the King" clip when ready.
+- **Truthbomb voice line**: `script/truthbomb.lua` handles `hmfea-truthbomb-detonated` script triggers and currently only logs. Add a `surface.play_sound` call with the Michael Caine clip path once the asset lands.
 
 ## Biters
 

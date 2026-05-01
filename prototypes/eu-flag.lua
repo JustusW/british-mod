@@ -15,7 +15,7 @@ for tier = 1, TIER_COUNT do
     local name = (tier == 1) and "hmfea-eu-flag" or ("hmfea-eu-flag-tier-" .. tier)
     local mining_time = BASE_MINING_TIME * TIME_FACTOR ^ (tier - 1)
     local scale = BASE_SCALE * SCALE_FACTOR ^ (tier - 1)
-    table.insert(prototypes, {
+    local proto = {
         type = "simple-entity-with-owner",
         name = name,
         icon = Placeholder.icon_path(),
@@ -36,9 +36,14 @@ for tier = 1, TIER_COUNT do
             scale = scale,
         },
         render_layer = "object",
-        localised_name = { "hmfea.eu-flag-name" },
-        localised_description = { "hmfea.eu-flag-description" },
-    })
+    }
+    -- Tier 1 auto-resolves locale via [entity-name] hmfea-eu-flag;
+    -- higher tiers share the same string via cross-reference.
+    if tier > 1 then
+        proto.localised_name = { "entity-name.hmfea-eu-flag" }
+        proto.localised_description = { "entity-description.hmfea-eu-flag" }
+    end
+    table.insert(prototypes, proto)
 end
 
 data:extend(prototypes)

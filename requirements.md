@@ -15,7 +15,7 @@ The factory has been issued a Royal Charter. Tea is mandatory, exoskeletons are 
 
 - **Officers don't run.** Equipping an exoskeleton kills the player instantly.
 - **Tea is fragile.** Cuppa Tea is hand-craft only; if it spoils on you, you serve a 60-second sentence in the Tower of London (player locked out / teleported / immobilised — exact mechanism in design).
-- **Food keeps you civilised.** The On-Tick debuff cannot be paused or disabled in-game. If the Craven stage triggers, your factory is effectively shut down (a fake beacon imposes a near-infinite electricity demand) until you eat.
+- **Food keeps you civilised.** The On-Tick debuff cannot be paused or disabled in-game. If the Craven stage triggers, every assembling machine, furnace, lab, rocket silo, and mining drill on the player's force is paused until somebody on the force eats.
 - **No bots on EU soil.** EU Flags dropped by dead biters cannot be mined by construction bots — only by hand, and hand-mining one takes 30 seconds.
 - **Tank protocol.** While occupying the tank, "God Save the King" plays continuously. It cannot be muted without muting the game itself. The recording is intentionally low quality (drunk man yelling, or similar).
 
@@ -115,6 +115,7 @@ Reaching Craven grants the **Bloody Uncivilised** achievement.
 - Victory jingle replaced with _"Fuck this Shit I'm Out."_
 - Tank loop: continuous "God Save the King" (bad recording — drunk yelling or similar).
 - Truthbomb detonation: Michael Caine voice line.
+- **Placeholder audio.** Any final clip that isn't ready ships with a placeholder — usually a short vanilla sound effect, or silence in the case of voice lines. Like the placeholder graphics rule, an audio placeholder is a marker that the asset is **TBD** and must be replaced before release. Design lists which clips are still placeholders.
 
 ## Biters
 
