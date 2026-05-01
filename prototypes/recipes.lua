@@ -39,4 +39,16 @@ data:extend({
         },
         results = { { type = "item", name = "hmfea-truthbomb", amount = 1 } },
     },
+    {
+        type = "recipe",
+        name = "hmfea-mr-blobby",
+        enabled = false,  -- unlocked by hmfea-mr-blobby research (or by setting flip)
+        energy_required = 60,
+        ingredients = {
+            { type = "item", name = "low-density-structure", amount = 100 },
+            { type = "item", name = "processing-unit",       amount = 200 },
+            { type = "item", name = "plastic-bar",           amount = 500 },
+        },
+        results = { { type = "item", name = "hmfea-mr-blobby", amount = 1 } },
+    },
 })
