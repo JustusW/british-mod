@@ -120,4 +120,23 @@ data:extend({
             { type = "unlock-recipe", recipe = "hmfea-spell-avada-kedavra" },
         },
     },
+    {
+        type = "technology",
+        name = "hmfea-philosophers-stone",
+        icon = Placeholder.icon_path(),
+        icon_size = 64,
+        prerequisites = { "chemical-science-pack" },
+        unit = {
+            count = 500,
+            ingredients = {
+                { "automation-science-pack", 1 },
+                { "logistic-science-pack",   1 },
+                { "chemical-science-pack",   1 },
+            },
+            time = 60,
+        },
+        -- Effects: none directly. The unlocking is via being a prerequisite
+        -- of vanilla tank tech (see prototypes/updates/tank-prereq.lua).
+        effects = {},
+    },
 })
