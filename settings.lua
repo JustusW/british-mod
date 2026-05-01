@@ -13,4 +13,11 @@ data:extend({
         default_value = false,
         order = "b",
     },
+    {
+        type = "bool-setting",
+        name = "hmfea-enable-mr-blobby",
+        setting_type = "runtime-global",
+        default_value = true,
+        order = "c",
+    },
 })
