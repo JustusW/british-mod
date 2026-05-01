@@ -51,4 +51,48 @@ data:extend({
         },
         results = { { type = "item", name = "hmfea-mr-blobby", amount = 1 } },
     },
+    {
+        type = "recipe",
+        name = "hmfea-wand",
+        enabled = false,
+        energy_required = 5,
+        ingredients = {
+            { type = "item", name = "wood",        amount = 1 },
+            { type = "item", name = "iron-stick",  amount = 1 },
+        },
+        results = { { type = "item", name = "hmfea-wand", amount = 1 } },
+    },
+    {
+        type = "recipe",
+        name = "hmfea-spell-petrificus-totalus",
+        enabled = false,
+        energy_required = 5,
+        ingredients = {
+            { type = "item", name = "hmfea-wand",  amount = 1 },
+            { type = "item", name = "stone",       amount = 5 },
+        },
+        results = { { type = "item", name = "hmfea-spell-petrificus-totalus", amount = 1 } },
+    },
+    {
+        type = "recipe",
+        name = "hmfea-spell-abra-kadabra",
+        enabled = false,
+        energy_required = 10,
+        ingredients = {
+            { type = "item", name = "hmfea-wand",  amount = 1 },
+            { type = "item", name = "explosives",  amount = 5 },
+        },
+        results = { { type = "item", name = "hmfea-spell-abra-kadabra", amount = 1 } },
+    },
+    {
+        type = "recipe",
+        name = "hmfea-spell-avada-kedavra",
+        enabled = false,
+        energy_required = 5,
+        ingredients = {
+            { type = "item", name = "hmfea-wand",        amount = 1 },
+            { type = "item", name = "copper-cable",      amount = 10 },
+        },
+        results = { { type = "item", name = "hmfea-spell-avada-kedavra", amount = 1 } },
+    },
 })
