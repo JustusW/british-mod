@@ -97,25 +97,22 @@ data:extend({
         },
         results = { { type = "item", name = "hmfea-porcelain", amount = 1 } },
     },
-    -- Wood (greenhouse-grown) -> Paper. Wired to vanilla wood for now; the
-    -- Greenhouse building will gate this once it lands.
+    -- Wood -> Paper. Made in the Greenhouse (hmfea-greenhouse category).
     {
         type = "recipe",
         name = "hmfea-paper",
         enabled = true,
-        energy_required = 1,
+        category = "hmfea-greenhouse",
+        energy_required = 2,
         ingredients = { { type = "item", name = "wood", amount = 2 } },
         results = { { type = "item", name = "hmfea-paper", amount = 1 } },
     },
-    -- Raw tea is grown in the greenhouse — until the building lands, no recipe
-    -- here (forces the player to wait for the greenhouse). For load-correctness
-    -- though we ship a placeholder hand-craft recipe so the chain is testable
-    -- end-to-end. Will be removed when the greenhouse lands.
+    -- Raw tea: grown in the Greenhouse from wood as a starter cutting.
     {
         type = "recipe",
         name = "hmfea-raw-tea",
         enabled = true,
-        category = "crafting",
+        category = "hmfea-greenhouse",
         energy_required = 5,
         ingredients = { { type = "item", name = "wood", amount = 1 } },
         results = { { type = "item", name = "hmfea-raw-tea", amount = 1 } },
