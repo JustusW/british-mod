@@ -1,7 +1,9 @@
--- EU Flag drops on biter / spitter death. Robot mining of flags is blocked
--- by cancelling any deconstruction order placed on them. Players who mine a
--- flag in under 30 seconds (i.e. with mining-speed upgrades) trigger a
--- respawn at the next tier (1.5× bigger / slower), capped at tier 5.
+-- EU Flag drops on biter / spitter death. Robot mining is blocked by the
+-- "not-deconstructable" entity-prototype flag (see prototypes/eu-flag.lua) —
+-- the deconstruction planner refuses to mark the flag, so no robot is ever
+-- dispatched. Players who hand-mine a flag in under 30 seconds (i.e. with
+-- mining-speed upgrades) trigger a respawn at the next tier (1.5× bigger /
+-- slower), capped at tier 5.
 local Log = require("script.log")
 local EuFlag = {}
 
@@ -60,25 +62,6 @@ function EuFlag.on_entity_died(event)
             pos.x, pos.y, entity.name
         ))
     end
-end
-
-function EuFlag.on_marked_for_deconstruction(event)
-    local entity = event.entity
-    if not (entity and entity.valid) then return end
-    if not tier_of(entity.name) then return end
-    if entity.cancel_deconstruction then
-        entity.cancel_deconstruction(entity.force)
-    end
-    if event.player_index then
-        local player = game.get_player(event.player_index)
-        if player and player.valid then
-            player.create_local_flying_text({
-                text = { "hmfea.eu-flag-no-bots" },
-                position = entity.position,
-            })
-        end
-    end
-    Log.debug("eu-flag", "event=robot_mining_blocked")
 end
 
 -- Per-tick mining-state polling. Detects mining-start transitions per player.

@@ -93,10 +93,6 @@ script.on_event(defines.events.on_entity_died, function(event)
     EuFlag.on_entity_died(event)
 end)
 
-script.on_event(defines.events.on_marked_for_deconstruction, function(event)
-    EuFlag.on_marked_for_deconstruction(event)
-end)
-
 script.on_event(defines.events.on_unit_group_finished_gathering, function(event)
     Expansion.on_unit_group_finished_gathering(event)
 end)
