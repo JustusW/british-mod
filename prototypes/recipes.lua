@@ -27,4 +27,16 @@ data:extend({
         },
         results = { { type = "item", name = "hmfea-arrow", amount = 1 } },
     },
+    {
+        type = "recipe",
+        name = "hmfea-truthbomb",
+        enabled = false,  -- unlocked by hmfea-truthbomb research
+        energy_required = 30,
+        ingredients = {
+            { type = "item", name = "explosives",  amount = 50 },
+            { type = "item", name = "iron-plate",  amount = 100 },
+            { type = "item", name = "engine-unit", amount = 10 },
+        },
+        results = { { type = "item", name = "hmfea-truthbomb", amount = 1 } },
+    },
 })
