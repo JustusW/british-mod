@@ -1,9 +1,11 @@
 -- Petrificus Totalus: permanent movement disable for the target.
 --
--- - Player target -> moved into a permission group that disables every
---   input_action except viewing the map / opening the radar. The character
---   stays in the world but cannot move, mine, craft, place, or build.
---   Sticky across save/load: on rejoin, the player is re-added to the group.
+-- - Player target -> moved into a permission group that blocks the
+--   movement and manual-mining input actions but leaves the rest of the
+--   game accessible (build, ghost placement via map, blueprints, crafting,
+--   chat, GUIs). The character stays in the world but cannot walk and
+--   cannot directly mine. The player still plays — from the radar, with
+--   construction bots. Sticky across save / load.
 -- - Unit target (biter / spitter) -> stop command issued at maximum
 --   ticks_to_wait. Persists with the unit's saved state.
 local Log = require("script.log")
@@ -12,20 +14,16 @@ local Petrificus = {}
 local PETRIFY_RADIUS = 2.5
 local PETRIFY_GROUP_NAME = "hmfea-petrified-player"
 
--- Input actions left enabled. Everything else is disabled. Keep this list
--- minimal — the requirement is "view the radar, nothing more".
-local PETRIFIED_ALLOWED = {
-    "open_gui",                    -- needed to open the map at all
-    "close_gui",
-    "write_to_console",            -- chat
-    "set_filter",                  -- harmless GUI side effect
-    "open_blueprint_library_gui",  -- still allow looking at blueprints
-    "open_kills_gui",
-    "open_train_gui",
-    "open_train_station_gui",
-    "open_logistic_gui",
-    "open_technology_gui",
-    "edit_permission_group",       -- prevent admin lockout if a player is unlucky
+-- Input actions disabled for petrified players. Anything not on this list is
+-- allowed (Factorio permission groups default to all-allowed for new groups).
+-- The intent is "frozen on the spot, but ghost placement + blueprints +
+-- construction bots still work". So we block movement, manual mining, and
+-- hand-crafting. Ghost placement via the map and blueprint / deconstruction
+-- tooling stay enabled — that's how the petrified player still plays.
+local PETRIFIED_DENIED = {
+    "start_walking",   -- WASD movement
+    "begin_mining",    -- start manual entity mining
+    "craft",           -- queue a craft in the player's character
 }
 
 local function init_storage()
@@ -47,17 +45,11 @@ local function get_or_create_petrify_group()
     local group = game.permissions.get_group(PETRIFY_GROUP_NAME)
     if group then return group end
     group = game.permissions.create_group(PETRIFY_GROUP_NAME)
-    -- Disable every input action.
-    for _, action_id in pairs(defines.input_action) do
-        group.set_allows_action(action_id, false)
-    end
-    -- Re-enable the small allow-list (each guarded by existence — input_action
-    -- ids vary across Factorio 2.0 builds and we don't want to crash if one
-    -- isn't present).
-    for _, action_name in ipairs(PETRIFIED_ALLOWED) do
+    -- New groups default to all-allowed; we only flip the denied actions.
+    for _, action_name in ipairs(PETRIFIED_DENIED) do
         local id = defines.input_action[action_name]
         if id then
-            group.set_allows_action(id, true)
+            group.set_allows_action(id, false)
         end
     end
     return group
