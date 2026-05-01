@@ -1,5 +1,6 @@
 -- Top-level dispatcher. Each feature lives in script/<feature>.lua and exports
 -- on_* functions; this file wires them into the Factorio event API.
+local Migration = require("script.migration")
 local Medkit = require("script.medkit")
 local Pistol = require("script.pistol")
 local Exoskeleton = require("script.exoskeleton")
@@ -14,6 +15,7 @@ local Expansion = require("script.expansion")
 local Petrificus = require("script.petrificus")
 
 script.on_init(function()
+    Migration.on_init()
     Medkit.on_init()
     Pistol.on_init()
     Exoskeleton.on_init()
@@ -25,6 +27,7 @@ script.on_init(function()
 end)
 
 script.on_configuration_changed(function()
+    Migration.on_configuration_changed()
     Medkit.on_configuration_changed()
     Pistol.on_configuration_changed()
     Exoskeleton.on_configuration_changed()
@@ -54,6 +57,7 @@ script.on_event(defines.events.on_player_joined_game, function(event)
     Exoskeleton.on_player_joined_game(event)
     Cravings.on_player_joined_game(event)
     Petrificus.on_player_joined_game(event)
+    Blobby.on_player_joined_game(event)
 end)
 
 script.on_event(defines.events.on_player_armor_inventory_changed, function(event)

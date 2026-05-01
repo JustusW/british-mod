@@ -121,7 +121,7 @@ Reaching Craven grants the **Bloody Uncivilised** achievement.
 - Biters are reskinned as **Rambo** soldiers — GI helmets, medals.
 - **Spitter nests** are reskinned as **Barrack Tents**.
 - **Biter nests** are reskinned as **EU Buildings**.
-- Biter **expansion parties** prioritise **oil patches** first and other resource patches second when picking where to found a new nest. (Regular attack groups are unaffected — only the expansion / colonisation pathfinding leans toward resources.)
+- Biter **expansion parties** prioritise **oil patches** first and other resource patches second when picking where to found a new nest. The party retargets to the **nearest** crude-oil entity (within reach of the gathering position), falling back to the nearest resource of any type. The intent is to block resources effectively — settling on top of patches denies them to the player. (Regular attack groups are unaffected — only the expansion / colonisation pathfinding leans toward resources.)
 - Dead biters drop an **EU Flag** on the ground:
   - Mining an EU Flag takes 30 seconds at base mining speed.
   - Bots cannot mine EU Flags — hand-mining only.

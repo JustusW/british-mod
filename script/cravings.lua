@@ -153,6 +153,13 @@ function Cravings.on_player_joined_game(event)
     local entry = storage.cravings.players[event.player_index]
     if not entry then
         set_stage(event.player_index, STAGE_SATIATED, game.tick)
+    elseif entry.stage == STAGE_CRAVEN then
+        -- Catch-up: a player who joins while their stored state is Craven
+        -- gets the achievement they would have earned earlier in the run.
+        local player = game.get_player(event.player_index)
+        if player and player.valid then
+            player.unlock_achievement("hmfea-bloody-uncivilised")
+        end
     end
 end
 

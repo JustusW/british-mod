@@ -249,7 +249,15 @@ Single source of truth for every mod setting. Match this against `settings.lua` 
 
 ## Save & migration
 
-- TBD. Initial release does not need migrations.
+Storage layout is versioned via `storage.schema_version`. The framework lives in `script/migration.lua` and follows this contract:
+
+- `Migration.on_init()` runs from `control.lua`'s `script.on_init` **before** any other module's `on_init`. It sets `storage.schema_version = LATEST_VERSION` (currently `0`).
+- `Migration.on_configuration_changed()` runs from `control.lua`'s `script.on_configuration_changed` **before** any other module's `on_configuration_changed`. It walks `migrations[from]` for `from = current..LATEST-1`, each mutating storage and bumping the version by one.
+- New migrations append to the `migrations` table in `script/migration.lua`. Never remove an entry. Bump `LATEST_VERSION` whenever the persisted layout changes incompatibly.
+
+Current version: `0` (baseline). No migrations registered yet.
+
+When a feature module changes its storage shape, the change goes through this framework so saves persisted under older mod versions get upgraded silently on load.
 
 ## Non-goals
 
