@@ -50,6 +50,39 @@ local function spell_capsule(name, target_effects, range, cooldown)
     }
 end
 
+-- Self-targeted capsule shape — used by Abra Kadabra so the explosion centres
+-- on the caster regardless of where the cursor is aimed.
+local function spell_self_capsule(name, target_effects, cooldown)
+    return {
+        type = "capsule",
+        name = name,
+        icon = Placeholder.icon_path(),
+        icon_size = 64,
+        subgroup = "capsule",
+        order = "d[capsule]-z[hmfea]-" .. name,
+        stack_size = 10,
+        capsule_action = {
+            type = "use-on-self",
+            attack_parameters = {
+                type = "projectile",
+                activation_type = "consume",
+                ammo_category = "capsule",
+                cooldown = cooldown or 60,
+                range = 1,
+                ammo_type = {
+                    action = {
+                        type = "direct",
+                        action_delivery = {
+                            type = "instant",
+                            target_effects = target_effects,
+                        },
+                    },
+                },
+            },
+        },
+    }
+end
+
 -- Petrificus Totalus: fires a script trigger at the throw point. Handler
 -- in script/petrificus.lua finds entities in a small radius and permanently
 -- immobilises them (god controller for player characters, stop-command
@@ -101,7 +134,7 @@ local kedavra_effects = {
 }
 
 data:extend({
-    spell_capsule("hmfea-spell-petrificus-totalus", petrificus_effects, 25, 90),
-    spell_capsule("hmfea-spell-abra-kadabra",       kadabra_effects,    25, 180),
-    spell_capsule("hmfea-spell-avada-kedavra",      kedavra_effects,    35, 60),
+    spell_capsule(     "hmfea-spell-petrificus-totalus", petrificus_effects, 25, 90),
+    spell_self_capsule("hmfea-spell-abra-kadabra",       kadabra_effects,        180),
+    spell_capsule(     "hmfea-spell-avada-kedavra",      kedavra_effects,    35, 60),
 })
