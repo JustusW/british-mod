@@ -81,10 +81,6 @@ Logs-first approach — when a feature misbehaves we read the log, we don't gues
 - Debug fixtures live under a single subgroup so they're easy to spot in the crafting menu and easy to strip from a release build.
 - Tower of London teleport, instant-craft Cuppa Tea, force-craven trigger, etc. are candidate fixtures; add them as features land.
 
-## Forces
-
-- TBD. Default plan: stay on the vanilla `player` and `enemy` forces; biter reskins do not change force assignment.
-
 ## Recipes
 
 ### Cuppa Tea

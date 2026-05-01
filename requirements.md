@@ -1,6 +1,6 @@
 # His Majesty's Factory Expansion Act — Requirements
 
-The factory has been issued a Royal Charter. Tea is mandatory, exoskeletons are forbidden, and victory is announced by Michael Caine.
+The factory has been issued a Royal Charter. Tea is mandatory, exoskeletons are forbidden, and Mr. Blobby announces victory.
 
 ## Player flow
 
