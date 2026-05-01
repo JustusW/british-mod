@@ -1,11 +1,11 @@
 -- Petrificus Totalus: permanent movement disable for the target.
 --
--- - Player target -> moved into a permission group that blocks the
---   movement and manual-mining input actions but leaves the rest of the
---   game accessible (build, ghost placement via map, blueprints, crafting,
---   chat, GUIs). The character stays in the world but cannot walk and
---   cannot directly mine. The player still plays — from the radar, with
---   construction bots. Sticky across save / load.
+-- - Player target -> moved into a permission group that denies movement
+--   (start_walking), manual mining (begin_mining), and hand-crafting
+--   (craft). Everything else stays allowed — build, ghost placement via
+--   map, blueprints, chat, GUIs. The character stays in the world but
+--   cannot walk, mine, or hand-craft. The player still plays — from the
+--   radar, with construction bots. Sticky across save / load.
 -- - Unit target (biter / spitter) -> stop command issued at maximum
 --   ticks_to_wait. Persists with the unit's saved state.
 local Log = require("script.log")
