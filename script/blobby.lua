@@ -133,4 +133,14 @@ function Blobby.on_research_finished(event)
     end
 end
 
+function Blobby.on_player_joined_game(event)
+    init_storage()
+    if storage.blobby.ever_flipped_off_during_run then
+        local player = game.get_player(event.player_index)
+        if player and player.valid then
+            player.unlock_achievement("hmfea-you-whimp")
+        end
+    end
+end
+
 return Blobby
