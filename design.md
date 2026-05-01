@@ -269,6 +269,8 @@ Single source of truth for every mod setting. Match this against `settings.lua` 
 | `hmfea-debug-fixtures` | startup bool | `false` | **implemented** | Gates debug-only entities, recipes, shortcuts (see "Debug fixtures"). |
 | `hmfea-enable-mr-blobby` | runtime-global bool | `true` | **implemented** | Toggles Mr. Blobby tech, win condition, and the **You Whimp** achievement trigger (see "Research"). |
 
+> **Why "debug" splits into two switches.** The engine forces the distinction. `hmfea-debug-logs` is **runtime-global** because diagnostic logging is reactive — when a player reports "the medkit didn't fire," you flip logs on, reproduce the bug, flip them off again, all without leaving the save. `hmfea-debug-fixtures` is **startup** because the things it gates are prototype data — debug entities (Tower of London teleport pad), debug recipes (instant-craft Cuppa Tea), debug shortcuts (force-craven button). Adding or removing prototypes mid-save corrupts the save, so Factorio only lets startup settings affect them. Two settings, two cadences, both correct.
+
 ## Save & migration
 
 Storage layout is versioned via `storage.schema_version`. The framework lives in `script/migration.lua` and follows this contract:
