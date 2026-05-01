@@ -178,7 +178,7 @@ Vanilla recipes / techs that the mutations target are kept enabled — these are
 
 ## Spells
 
-The Wand + Spells branch is implemented as new `hmfea-` prototypes. The Wand itself is a flavor item (no behaviour); the spells are thrown capsules with placeholder explosion / damage effects.
+The Wand + Spells branch is implemented as new `hmfea-` prototypes. The Wand itself is a flavor item (no behaviour); the spells are thrown or self-targeted capsules with placeholder explosion / damage effects.
 
 ### Prototypes — `prototypes/spells.lua`
 
