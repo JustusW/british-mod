@@ -232,11 +232,9 @@ Single source of truth for every mod setting. Match this against `settings.lua` 
 
 | Internal name | Type | Default | Status | Purpose |
 |---|---|---|---|---|
-| `hmfea-debug-logs` | runtime-global bool | `false` | **implemented (locale TODO)** | Gates all `Log.debug` writes (see "Telemetry"). |
-| `hmfea-debug-fixtures` | startup bool | `false` | **implemented (locale TODO)** | Gates debug-only entities, recipes, shortcuts (see "Debug fixtures"). |
+| `hmfea-debug-logs` | runtime-global bool | `false` | **implemented** | Gates all `Log.debug` writes (see "Telemetry"). |
+| `hmfea-debug-fixtures` | startup bool | `false` | **implemented** | Gates debug-only entities, recipes, shortcuts (see "Debug fixtures"). |
 | `hmfea-enable-mr-blobby` | runtime-global bool | `true` | **TBD** | Toggles Mr. Blobby tech, win condition, and the **You Whimp** achievement trigger (see "Research"). |
-
-> **Locale TODO:** the two implemented settings still need `[mod-setting-name]` and `[mod-setting-description]` entries in `locale/en/en.cfg` — they currently render as raw ids in the mod-settings UI. Add before the next release.
 
 ## Save & migration
 
