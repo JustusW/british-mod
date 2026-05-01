@@ -85,7 +85,7 @@ Listed in tech-unlock order. Each entry says whether it's a new weapon or a muta
 The visible tech tree leans into British memes, gating absurd capabilities behind expensive prerequisites.
 
 - **Yer'a Wizard 'Arry** — unlocks the **Wand**, which in turn enables a research branch of spells:
-  - **Petrificus Totalus** — turns the target to stone.
+  - **Petrificus Totalus** — permanently disables movement of the target. If the target is a player, they are switched to the god / spectator controller for the rest of the run — they get to play from radar. Hope they have robots.
   - **Abra Kadabra** — nuclear explosion centred on the player.
   - **Avada Kedavra** — fires a Tesla turret bolt.
 - **Philosopher's Stone** — required prerequisite to unlock the **Tank**.

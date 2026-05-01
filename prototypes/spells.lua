@@ -50,21 +50,15 @@ local function spell_capsule(name, target_effects, range, cooldown)
     }
 end
 
--- Petrificus Totalus: heavy physical damage placeholder for "turn to stone".
+-- Petrificus Totalus: fires a script trigger at the throw point. Handler
+-- in script/petrificus.lua finds entities in a small radius and permanently
+-- immobilises them (god controller for player characters, stop-command
+-- for units).
 local petrificus_effects = {
     { type = "create-entity", entity_name = "explosion" },
     {
-        type = "nested-result",
-        action = {
-            type = "area",
-            radius = 1.5,
-            action_delivery = {
-                type = "instant",
-                target_effects = {
-                    { type = "damage", damage = { amount = 1000, type = "physical" } },
-                },
-            },
-        },
+        type = "script",
+        effect_id = "hmfea-petrify",
     },
 }
 
