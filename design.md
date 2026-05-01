@@ -65,14 +65,16 @@ Logs-first approach — when a feature misbehaves we read the log, we don't gues
   | Tag | Status | Log lines |
   |---|---|---|
   | `[medkit]` | **implemented** | `event=used player=<idx> delay_ticks=<D>` on capsule use; `event=heal_fired healed=<count> amount=<HEAL_AMOUNT>` when the heal fires. |
-  | `[craving]` | **TBD** | On-Tick debuff stage transitions (`event=stage_change player=<idx> from=<stage> to=<stage>`); Bloody Uncivilised achievement firing. |
-  | `[mr-blobby]` | **TBD** | Runtime setting flips (`event=setting_changed from=<bool> to=<bool>`); You Whimp achievement firing (`event=achievement_fired name=hmfea-you-whimp`); auto-grant marked pending (`event=auto_grant_marked force=<idx>`); auto-grant fired (`event=auto_grant_fired force=<idx>`); victory text branch on launch (`event=win_text variant=<standard\|consolation> force=<idx>`). |
-  | `[tower-of-london]` | **TBD** | Cuppa Tea spoil events triggering the sentence (`event=sentenced player=<idx> ticks=<duration>`). |
-  | `[exoskeleton]` | **TBD** | Armor-grid kills (`event=killed player=<idx>`). |
-  | `[eu-flag]` | **TBD** | Flag spawns (`event=spawned x=<x> y=<y>`); blocked robot mining (`event=robot_mining_blocked`). |
-  | `[pistol]` | **TBD** | Blocked Pis-what-now? fire attempts (`event=fire_blocked player=<idx>`). |
+  | `[craving]` | **implemented** | On-Tick debuff stage transitions (`event=stage_change player=<idx> from=<stage> to=<stage>`); `event=achievement_fired name=hmfea-bloody-uncivilised player=<idx>` on Craven entry. |
+  | `[mr-blobby]` | **implemented** | Runtime setting flips (`event=setting_changed from=<bool> to=<bool>`); `event=achievement_fired name=hmfea-you-whimp` on first true→false flip; auto-grant marked pending (`event=auto_grant_marked force=<idx>`); auto-grant fired (`event=auto_grant_fired force=<idx>`); victory text branch on launch (`event=win_text variant=<standard\|consolation> force=<idx>`). |
+  | `[tower-of-london]` | **implemented** | `event=sentenced player=<idx> ticks=<duration>` on spoiled-tea detection; `event=released player=<idx>` on sentence expiry. |
+  | `[exoskeleton]` | **implemented** | `event=killed player=<idx>` on each enforced death. |
+  | `[eu-flag]` | **implemented** | Flag spawns (`event=spawned x=<x> y=<y> from=<biter-name>`); blocked robot mining (`event=robot_mining_blocked`). |
+  | `[pistol]` | **implemented** | Blocked Pis-what-now? fire attempts (`event=fire_blocked player=<idx>`). |
+  | `[expansion]` | **implemented** | Biter expansion-party retargets (`event=retarget group=<idx> from=<x,y> to=<x,y> resource=<name>`). |
+  | `[truthbomb]` | **implemented** | `event=detonated x=<x> y=<y>` when the bomb's script trigger fires. |
+  | `[tank]` | **implemented** | `event=mounted player=<idx>` / `event=dismounted player=<idx>` on driving-state changes. |
   | `[placeholder]` | **TBD** | Optional surfacing of prototypes still wired to placeholder art (`event=in_use prototype=<name>`). |
-  | `[expansion]` | **TBD** | Biter expansion-party retargets (`event=retarget group=<idx> from=<x,y> to=<x,y> resource=<name>`). |
 
   Add a new subsystem row the moment a feature touches `control.lua`. No untagged log lines.
 - Per-feature log lines are required: every new feature added under the spec-first flow must list its log line(s) in its design section before the code lands.
@@ -106,7 +108,10 @@ Logs-first approach — when a feature misbehaves we read the log, we don't gues
 
 ## Tower of London
 
-- TBD. Candidate mechanisms: teleport player into a small enclosed structure on a hidden surface, or apply a Factorio "stuck" effect (movement disabled, mining disabled) for 60 seconds. Pick one in design.
+- Trigger: `script/tower-of-london.lua` watches `on_player_main_inventory_changed`. Whenever `hmfea-spoiled-tea` appears in a player's main inventory, the item is removed and the player is sentenced.
+- Mechanism: a runtime permission group `hmfea-tower-of-london` is created lazily (every `defines.input_action` set to `false`, with chat-related actions left allowed so the player can still talk through the bars). The player is moved into the group; the original group name is recorded in `storage.tower_of_london.sentenced[player_index].original_group`.
+- Duration: 60 seconds (3600 ticks). On `on_tick`, expired sentences are released — the player is moved back to their original group (fallback: `Default`).
+- Telemetry: `[tower-of-london]` — see Subsystems table.
 
 ## On-Tick debuff (food cravings)
 
@@ -209,10 +214,10 @@ The **You Whimp** achievement is wired separately (see Achievements). Trigger is
 ## Biters
 
 - Reskins are pure prototype graphic overrides on `biter`, `spitter`, `biter-spawner`, `spitter-spawner`.
-- **Expansion-party AI focus** (TBD on exact mechanism): the bias only applies to *expansion* / *colonisation* groups — the AI parties dispatched by `LuaForce.set_evolution_factor`-driven expansion logic to found new nests — not to ordinary attack groups. Candidates:
-  - Hook `defines.events.on_unit_group_finished_gathering` (or the build-base equivalent) and, for groups whose `command.type == defines.command.build_base`, retarget the destination to the nearest chunk containing a `crude-oil` resource entity, falling back to the nearest other ore/resource chunk if no oil is reachable. Untouched groups (attack-by-pollution) keep vanilla behaviour.
-  - Tune `enemy_expansion` map settings (`min_expansion_cooldown`, `settler_group_max_size`, `max_expansion_distance`) only if needed; bias should be implemented in script, not by widening the search radius globally.
-  - Telemetry: `[expansion]` subsystem (TBD) — log retargets so we can verify the bias in a save replay.
+- **Expansion-party AI focus** (implemented in `script/expansion.lua`): the bias only applies to expansion / colonisation groups — the AI parties dispatched by Factorio's enemy-expansion logic to found new nests — not to ordinary attack groups.
+  - Hook: `defines.events.on_unit_group_finished_gathering`. For groups whose `command.type == defines.command.build_base`, retarget the destination to the nearest `crude-oil` resource entity within 256 tiles, falling back to the nearest resource of any type if no oil is reachable. Untouched groups (attack-by-pollution) keep vanilla behaviour.
+  - Map settings (`enemy_expansion.*`) are not tuned; the bias is purely script-side.
+  - Telemetry: `[expansion]` subsystem — see Subsystems table.
 - **EU Flag** drops: `on_entity_died` filtered to biter / spitter prototypes spawns an `hmfea-eu-flag` entity at the corpse position. The flag is a `simple-entity-with-owner` with `minable.mining_time = 30` (30 in mining-time units; map to the desired wall-clock seconds based on player mining speed during prototyping). `simple-entity-with-owner` has no native "not minable by robot" field, so robot mining is blocked at runtime via `script.on_event(defines.events.on_robot_pre_mined, …)` filtered on the flag prototype: cancel the deconstruction order (`event.entity.cancel_deconstruction(force)` / clear the order) and surface a flying-text message. Pre-place protections also drop any deconstruction marker the player set on a flag.
 
 ## Achievements
@@ -221,8 +226,8 @@ Single source of truth for every achievement the mod ships. New achievements get
 
 | Internal name | Display title | Status | Trigger | Subsystem log tag |
 |---|---|---|---|---|
-| `hmfea-you-whimp` | You Whimp | **TBD** | `on_runtime_mod_setting_changed` for `hmfea-enable-mr-blobby` flipping `true → false` during a running game. Does **not** fire on a fresh-start setting choice. | `[mr-blobby]` |
-| `hmfea-bloody-uncivilised` | Bloody Uncivilised | **TBD** | Player enters the **Craven** stage of the On-Tick debuff (see "On-Tick debuff"). | `[craving]` |
+| `hmfea-you-whimp` | You Whimp | **implemented** | `on_runtime_mod_setting_changed` for `hmfea-enable-mr-blobby` flipping `true → false` during a running game. Does **not** fire on a fresh-start setting choice. | `[mr-blobby]` |
+| `hmfea-bloody-uncivilised` | Bloody Uncivilised | **implemented** | Player enters the **Craven** stage of the On-Tick debuff (see "On-Tick debuff"). | `[craving]` |
 
 Locale ids follow the prototype name (`achievement-name.hmfea-you-whimp`, etc.).
 
@@ -234,7 +239,7 @@ Single source of truth for every mod setting. Match this against `settings.lua` 
 |---|---|---|---|---|
 | `hmfea-debug-logs` | runtime-global bool | `false` | **implemented** | Gates all `Log.debug` writes (see "Telemetry"). |
 | `hmfea-debug-fixtures` | startup bool | `false` | **implemented** | Gates debug-only entities, recipes, shortcuts (see "Debug fixtures"). |
-| `hmfea-enable-mr-blobby` | runtime-global bool | `true` | **TBD** | Toggles Mr. Blobby tech, win condition, and the **You Whimp** achievement trigger (see "Research"). |
+| `hmfea-enable-mr-blobby` | runtime-global bool | `true` | **implemented** | Toggles Mr. Blobby tech, win condition, and the **You Whimp** achievement trigger (see "Research"). |
 
 ## Save & migration
 
