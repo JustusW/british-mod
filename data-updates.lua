@@ -4,3 +4,5 @@
 
 require("prototypes.updates.pistol")
 require("prototypes.updates.character")
+require("prototypes.updates.batons")
+require("prototypes.updates.musket")
