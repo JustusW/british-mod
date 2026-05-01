@@ -56,10 +56,12 @@ data:extend({
 })
 
 -- Cuppa Tea: the final, spoiling consumable. Hand-craft only via the
--- hmfea-hand-only recipe category.
+-- hmfea-hand-only recipe category. Capsule type so the player consumes it
+-- via the use-on-self mechanic — script/cravings.lua catches the use and
+-- resets the food-craving state.
 data:extend({
     {
-        type = "item",
+        type = "capsule",
         name = "hmfea-cuppa-tea",
         icon = Placeholder.icon_path(),
         icon_size = 64,
@@ -68,6 +70,17 @@ data:extend({
         stack_size = 50,
         spoil_ticks = 60 * 60 * 5,  -- 5 minutes (placeholder, tune in playtest)
         spoil_result = "hmfea-spoiled-tea",
+        capsule_action = {
+            type = "use-on-self",
+            attack_parameters = {
+                type = "projectile",
+                activation_type = "consume",
+                ammo_category = "capsule",
+                range = 1,
+                cooldown = 30,
+                ammo_type = {},
+            },
+        },
     },
 })
 

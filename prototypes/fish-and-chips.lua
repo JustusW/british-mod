@@ -17,9 +17,33 @@ local function basic_item(name, subgroup, order, stack)
 end
 
 data:extend({
-    basic_item("hmfea-potato",         "intermediate-product", "a-b-a[hmfea-potato]"),
-    basic_item("hmfea-chips",          "intermediate-product", "a-b-b[hmfea-chips]"),
-    basic_item("hmfea-fish-and-chips", "intermediate-product", "a-b-c[hmfea-fish-and-chips]", 50),
+    basic_item("hmfea-potato", "intermediate-product", "a-b-a[hmfea-potato]"),
+    basic_item("hmfea-chips",  "intermediate-product", "a-b-b[hmfea-chips]"),
+})
+
+-- Fish & Chips is a capsule so the player consumes it via use-on-self;
+-- script/cravings.lua catches the use and resets the craving timer.
+data:extend({
+    {
+        type = "capsule",
+        name = "hmfea-fish-and-chips",
+        icon = Placeholder.icon_path(),
+        icon_size = 64,
+        subgroup = "intermediate-product",
+        order = "a-b-c[hmfea-fish-and-chips]",
+        stack_size = 50,
+        capsule_action = {
+            type = "use-on-self",
+            attack_parameters = {
+                type = "projectile",
+                activation_type = "consume",
+                ammo_category = "capsule",
+                range = 1,
+                cooldown = 30,
+                ammo_type = {},
+            },
+        },
+    },
 })
 
 data:extend({
