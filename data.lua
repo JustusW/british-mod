@@ -5,4 +5,5 @@
 require("prototypes.placeholder")
 require("prototypes.items")
 require("prototypes.weapons")
+require("prototypes.cuppa-tea")
 require("prototypes.recipes")
