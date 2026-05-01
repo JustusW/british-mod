@@ -107,11 +107,14 @@ function Blobby.on_runtime_mod_setting_changed(event)
         tostring(not now_off), tostring(now_off)
     ))
     if now_off then
-        -- The first true -> false flip in a running game is what earns
-        -- You Whimp; the achievement firing itself is wired separately
-        -- once the achievement prototype lands. For now we mark the storage
-        -- so the achievement code can detect "ever flipped during run".
-        storage.blobby.ever_flipped_off_during_run = true
+        -- First true -> false flip during a running game earns You Whimp.
+        if not storage.blobby.ever_flipped_off_during_run then
+            storage.blobby.ever_flipped_off_during_run = true
+            for _, p in pairs(game.connected_players) do
+                p.unlock_achievement("hmfea-you-whimp")
+            end
+            Log.debug("mr-blobby", "event=achievement_fired name=hmfea-you-whimp")
+        end
         evaluate_all_forces()
     end
 end

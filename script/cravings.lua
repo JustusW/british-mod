@@ -82,7 +82,14 @@ local function set_stage(player_index, stage, current_tick)
 
     if stage == STAGE_CRAVEN then
         ensure_drain(player_index)
-        -- TODO: fire hmfea-bloody-uncivilised achievement once the prototype lands.
+        local player = game.get_player(player_index)
+        if player and player.valid then
+            player.unlock_achievement("hmfea-bloody-uncivilised")
+            Log.debug("craving", string.format(
+                "event=achievement_fired name=hmfea-bloody-uncivilised player=%d",
+                player_index
+            ))
+        end
     elseif prev_stage == STAGE_CRAVEN then
         remove_drain(player_index)
     end
