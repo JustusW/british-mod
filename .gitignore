@@ -1,0 +1,9 @@
+# Build artefacts produced by tools/build.ps1
+dist/
+
+# Editor / OS noise
+.vscode/
+.factorio-dev/
+*.log
+.DS_Store
+Thumbs.db
