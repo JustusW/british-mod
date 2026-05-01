@@ -72,26 +72,7 @@ Logs-first approach — when a feature misbehaves we read the log, we don't gues
 - All script-side debug output goes to `script-output/hmfea-debug.txt`. Chat (`game.print`) is reserved for player-facing messages only; debug `game.print` calls are bugs and must be migrated to the log file.
 - Every log line is gated on a single runtime-global mod setting `hmfea-debug-logs` (defined in `settings.lua`, default **off**). When the flag is off no I/O happens — log writes are fully short-circuited inside `Log.debug`.
 - Log format: one line per event, `[<subsystem>] tick=N key=value key=value …`. Keep keys short and stable so `grep` / `findstr` is the primary triage tool.
-- Subsystems currently in scope:
-
-  | Tag | Status | Log lines |
-  |---|---|---|
-  | `[medkit]` | **implemented** | `event=used player=<idx> delay_ticks=<D>` on capsule use; `event=heal_fired healed=<count> amount=<HEAL_AMOUNT>` when the heal fires. |
-  | `[craving]` | **implemented** | `event=stage_change player=<idx> from=<stage> to=<stage>` on On-Tick debuff transitions; `event=achievement_fired name=hmfea-bloody-uncivilised player=<idx>` on Craven entry; `event=force_shutdown force=<idx> entities=<count>` on first Craven entry per force; `event=force_restored force=<idx> entities=<count>` when no Craven players remain on the force. |
-  | `[mr-blobby]` | **implemented** | `event=setting_changed from=<bool> to=<bool>` on each setting flip; `event=achievement_fired name=hmfea-you-whimp` on first `true → false` flip; `event=auto_grant_marked force=<idx>` when prereqs aren't satisfied yet; `event=auto_grant_fired force=<idx>` when the research is granted; `event=win_text variant=<standard\|consolation> force=<idx>` on a Mr. Blobby launch; `event=win_suppressed force=<idx> reason=<reason>` on a non-Blobby launch (vanilla victory undone). |
-  | `[tower-of-london]` | **implemented** | `event=sentenced player=<idx> ticks=<duration>` on spoiled-tea detection; `event=released player=<idx>` on sentence expiry. |
-  | `[exoskeleton]` | **implemented** | `event=killed player=<idx>` on each enforced death. |
-  | `[eu-flag]` | **implemented** | `event=spawned x=<x> y=<y> from=<biter-name>` on biter death drop; `event=robot_mining_blocked` when a deconstruction order is cancelled; `event=fast_mine tier_was=<tier> elapsed_ticks=<n> player=<idx>` when a flag is mined under 30 s; `event=respawned tier=<tier> x=<x> y=<y>` when a respawned tier flag lands. |
-  | `[pistol]` | **implemented** | `event=fire_blocked player=<idx>` on each Pis-what-now? shoot attempt that the runtime guard intercepts. |
-  | `[expansion]` | **implemented** | `event=retarget group=<idx> from=<x,y> to=<x,y> resource=<name>` on each biter expansion-party retarget. |
-  | `[truthbomb]` | **implemented** | `event=detonated x=<x> y=<y>` when the bomb's script trigger fires. |
-  | `[tank]` | **implemented** | `event=mounted player=<idx>` / `event=dismounted player=<idx>` on driving-state changes. |
-  | `[petrificus]` | **implemented** | `event=petrified target=<unit\|player> name=<entity_name> id=<unit_number>` (units) or `event=petrified target=player player=<idx>` when a player is hit. |
-  | `[migration]` | **implemented** | `event=initialised version=<N>` from `Migration.on_init`; `event=running from=<N> to=<N+1>` for each migration step in `on_configuration_changed`. |
-  | `[placeholder]` | **TBD** | Optional surfacing of prototypes still wired to placeholder art (`event=in_use prototype=<name>`). |
-
-  Add a new subsystem row the moment a feature touches `control.lua`. No untagged log lines.
-- Per-feature log lines are required: every new feature added under the spec-first flow must list its log line(s) in its design section before the code lands.
+- Subsystem-tag namespace is owned by the per-feature design sections — each feature documents its own log lines next to the rest of its design. The source of truth for the full set of emitters is `grep -r 'Log.debug(' script/`. New features must list their log line(s) in their design section **before** the code lands, and may not emit untagged log lines.
 - Helper: `Log.debug(subsystem, line)` lives in `script/log.lua` and is the only place log writes happen. `control.lua` and any feature modules `require("script.log")` and call `Log.debug(...)`; they never touch `helpers.write_file` directly or hand-roll the gate check.
 
 ## Debug fixtures
@@ -125,7 +106,7 @@ Logs-first approach — when a feature misbehaves we read the log, we don't gues
 - Trigger: `script/tower-of-london.lua` watches `on_player_main_inventory_changed`. Whenever `hmfea-spoiled-tea` appears in a player's main inventory, the item is removed and the player is sentenced.
 - Mechanism: a runtime permission group `hmfea-tower-of-london` is created lazily (every `defines.input_action` set to `false`, with chat-related actions left allowed so the player can still talk through the bars). The player is moved into the group; the original group name is recorded in `storage.tower_of_london.sentenced[player_index].original_group`.
 - Duration: 60 seconds (3600 ticks). On `on_tick`, expired sentences are released — the player is moved back to their original group (fallback: `Default`).
-- Telemetry: `[tower-of-london]` — see Subsystems table.
+- Telemetry: `[tower-of-london] event=sentenced player=<idx> ticks=<duration>` on spoiled-tea detection; `[tower-of-london] event=released player=<idx>` on sentence expiry.
 
 ## On-Tick debuff (food cravings)
 
@@ -133,6 +114,7 @@ Logs-first approach — when a feature misbehaves we read the log, we don't gues
 - Stage timings: Satiated `3600 × 5 + math.random(0, 3600 * 5)` ticks (5 minutes base + 0–5 minutes random), Craving `3600` ticks, Craven infinite.
 - Craven enforcement: when any player on a force enters Craven, every entity on that force whose `type` is `assembling-machine`, `furnace`, `lab`, `rocket-silo`, or `mining-drill` and is currently active is set inactive (factory shutdown). The set of touched entities is stored on `storage.cravings.force_shutdowns[force_index]`. When the last Craven player on the force is satisfied, the same set is restored to active.
 - Eating Cuppa Tea or Fish & Chips: `Cravings.on_player_used_capsule` (wired from `control.lua`'s `on_player_used_capsule` dispatcher) checks `event.item.name` against `FOOD_ITEMS = { hmfea-cuppa-tea, hmfea-fish-and-chips }` and resets the player's stage to Satiated.
+- Telemetry: `[craving] event=stage_change player=<idx> from=<stage> to=<stage>` on every transition; `[craving] event=achievement_fired name=hmfea-bloody-uncivilised player=<idx>` on Craven entry; `[craving] event=force_shutdown force=<idx> entities=<count>` on first Craven entry per force; `[craving] event=force_restored force=<idx> entities=<count>` when no Craven players remain on the force.
 
 ## Vehicles & buildings
 
@@ -147,6 +129,7 @@ Logs-first approach — when a feature misbehaves we read the log, we don't gues
   - `on_player_armor_inventory_changed` — catches live equips.
   - `on_player_joined_game` — catches save loads where the equipment was already in the grid (the inventory-changed event does not fire on load).
   - `on_init` and `on_configuration_changed` — iterate `game.connected_players` and apply the helper, so adding the mod to an existing save retroactively enforces the rule.
+  - Telemetry: `[exoskeleton] event=killed player=<idx>` on each enforced death.
 
 ## Weapons
 
@@ -169,7 +152,7 @@ Listed in tech-unlock order, matched to `requirements.md`. Mix of new `hmfea-` p
 
 ### Tier 3 — Truthbomb research (final tech before Rocket Silo)
 
-- **Truthbomb (NHS Double Decker Bus)** — **new** prototype `hmfea-truthbomb` (capsule). New research `hmfea-truthbomb` is added to the tech tree as the prerequisite of `rocket-silo`. Detonation produces a radius-12 area explosion via `on_script_trigger_effect`. The Michael Caine voice line is **TBD** pending a sound asset (see "Placeholder audio") — `script/truthbomb.lua` currently only logs the trigger.
+- **Truthbomb (NHS Double Decker Bus)** — **new** prototype `hmfea-truthbomb` (capsule). New research `hmfea-truthbomb` is added to the tech tree as the prerequisite of `rocket-silo`. Detonation produces a radius-12 area explosion via `on_script_trigger_effect`. The Michael Caine voice line is **TBD** pending a sound asset (see "Placeholder audio") — `script/truthbomb.lua` currently only logs `[truthbomb] event=detonated x=<x> y=<y>`.
 
 Vanilla recipes / techs that the mutations target are kept enabled — these are reskins / retunes, not deletions. No `disable-recipe` or hidden-tech surgery is required.
 
@@ -221,7 +204,7 @@ Permanently disables movement of the target. Triggered when the `hmfea-petrify` 
   - `entity.type == "character"` — find the owning player (linear scan over `game.players` matching `p.character == entity`). Switch the player to the god controller (`player.set_controller{ type = defines.controllers.god }`), kill the character entity. Storage flag `storage.petrificus.players[player_index] = true` so the god-controller stick re-applies on rejoin (`Petrificus.on_player_joined_game`).
   - `entity.type == "unit"` — issue `set_command{ type = defines.command.stop, ticks_to_wait = 4_294_967_295, distraction = defines.distraction.none }`. Storage flag `storage.petrificus.units[unit_number] = true`. The stop command holds for the unit's lifetime; an idle `Petrificus.on_tick` re-issue hook is reserved (currently a no-op) for cases where a group steals the command back.
 - **Locale**: target player gets `hmfea.petrified-player` printed to chat ("Petrificus Totalus. You'll be playing from radar. Hope you have robots.").
-- **Telemetry**: `[petrificus]` — see Subsystems table.
+- **Telemetry**: `[petrificus] event=petrified target=unit name=<entity_name> id=<unit_number>` for unit hits; `[petrificus] event=petrified target=player player=<idx>` for player hits.
 
 ## Research
 
@@ -242,7 +225,7 @@ The win path is always the same: launch a Mr. Blobby payload via the rocket silo
 - **Victory text + state**: on `on_rocket_launched` with the Blobby payload, if `storage.blobby.auto_granted[force.index]` is true the rendered text is the consolation `{ "hmfea.blobby-consolation" }` (= "Mr. Blobby says: Did you really win?"); otherwise the standard victory text fires. The handler then calls `game.set_game_state{ game_finished = true, player_won = true, victorious_force = force, can_continue = true }` to confirm victory.
 - **Vanilla-victory suppression**: when a rocket launches **without** the Blobby payload, the handler calls `game.set_game_state{ game_finished = false, player_won = false, can_continue = true }` to undo any vanilla victory state and prints `hmfea.win-suppressed` to the force. This makes Mr. Blobby the only acknowledged win condition.
 - **Audio is unchanged in both cases** — the victory jingle replacement applies to either path.
-- Telemetry: see the `[mr-blobby]` row in the Telemetry table for the events emitted.
+- Telemetry: `[mr-blobby] event=setting_changed from=<bool> to=<bool>` on each setting flip; `event=achievement_fired name=hmfea-you-whimp` on first `true → false` flip; `event=auto_grant_marked force=<idx>` when prereqs aren't satisfied yet; `event=auto_grant_fired force=<idx>` when the research is granted; `event=win_text variant=<standard|consolation> force=<idx>` on a Mr. Blobby launch; `event=win_suppressed force=<idx> reason=<reason>` on a non-Blobby launch (vanilla victory undone).
 
 The **You Whimp** achievement is wired separately (see Achievements). Trigger is the first `true → false` flip of `hmfea-enable-mr-blobby` during a running game; it does not fire on a fresh-start setting choice and does not depend on the auto-grant having fired yet.
 
@@ -251,7 +234,7 @@ The **You Whimp** achievement is wired separately (see Achievements). Trigger is
 All three audio overrides below currently use **placeholder audio** (see "Placeholder audio") — final clips are TBD. The hooks are wired so swapping the asset is a one-line change per feature.
 
 - **Victory jingle**: planned `utility-sounds.game_won` override with the _"Fuck this Shit I'm Out"_ clip. Currently unwired — vanilla jingle plays. Add the override in `data-updates.lua` once the asset lands.
-- **Tank loop**: `script/tank.lua` hooks `on_player_driving_changed_state` to mark a player as in-tank, then `on_tick` plays `utility/new_objective` (placeholder vanilla sound) every 5 seconds while in tank. Swap the path to the "God Save the King" clip when ready.
+- **Tank loop**: `script/tank.lua` hooks `on_player_driving_changed_state` to mark a player as in-tank, then `on_tick` plays `utility/new_objective` (placeholder vanilla sound) every 5 seconds while in tank. Swap the path to the "God Save the King" clip when ready. Telemetry: `[tank] event=mounted player=<idx>` and `[tank] event=dismounted player=<idx>` on driving-state changes.
 - **Truthbomb voice line**: `script/truthbomb.lua` handles `hmfea-truthbomb-detonated` script triggers and currently only logs. Add a `surface.play_sound` call with the Michael Caine clip path once the asset lands.
 
 ## Biters
@@ -260,12 +243,13 @@ All three audio overrides below currently use **placeholder audio** (see "Placeh
 - **Expansion-party AI focus** (implemented in `script/expansion.lua`): the bias only applies to expansion / colonisation groups — the AI parties dispatched by Factorio's enemy-expansion logic to found new nests — not to ordinary attack groups.
   - Hook: `defines.events.on_unit_group_finished_gathering`. For groups whose `command.type == defines.command.build_base`, retarget the destination to the nearest `crude-oil` resource entity within 256 tiles, falling back to the nearest resource of any type if no oil is reachable. Untouched groups (attack-by-pollution) keep vanilla behaviour.
   - Map settings (`enemy_expansion.*`) are not tuned; the bias is purely script-side.
-  - Telemetry: `[expansion]` subsystem — see Subsystems table.
+  - Telemetry: `[expansion] event=retarget group=<idx> from=<x,y> to=<x,y> resource=<name>` on each retarget.
 - **EU Flag** drops: `on_entity_died` filtered to biter / spitter prototypes spawns an `hmfea-eu-flag` (tier 1) at the corpse position. The flag is a `simple-entity-with-owner` with `minable.mining_time = 30` seconds.
 - **Tiered escalation prototypes**: five tiered flag prototypes ship: `hmfea-eu-flag` (tier 1), `hmfea-eu-flag-tier-2` … `hmfea-eu-flag-tier-5`. Each tier has `mining_time = 30 × 1.5^(tier-1)` and `picture.scale = 0.5 × 1.5^(tier-1)` so the escalated flag is both bigger and slower to mine.
 - **Mining-state polling**: per-tick, `script/eu-flag.lua` reads each connected player's `LuaPlayer.mining_state.mining` + `LuaPlayer.selected`. When a player begins mining a flag, the `(player_index → unit_number, start_tick)` pair is recorded in `storage.eu_flag.mining_starts`. When mining is interrupted (state goes false or selection changes), the entry is cleared.
 - **Respawn on fast mining**: `on_pre_player_mined_item` filtered on flag entities. If the elapsed mining ticks (`game.tick - start_tick`) is `< 30 × 60`, queue a deferred (next tick) respawn at the same position using the next tier's prototype, capped at tier 5. Position is captured before the entity is removed.
 - **Robot-mining block**: `simple-entity-with-owner` has no native "not minable by robot" flag, so robot mining is blocked via `on_marked_for_deconstruction` filtered on the flag prototype: cancel the deconstruction order (`entity.cancel_deconstruction(force)`) and surface a `hmfea.eu-flag-no-bots` flying-text.
+- Telemetry: `[eu-flag] event=spawned x=<x> y=<y> from=<biter-name>` on biter death drop; `[eu-flag] event=robot_mining_blocked` when a deconstruction order is cancelled; `[eu-flag] event=fast_mine tier_was=<tier> elapsed_ticks=<n> player=<idx>` when a flag is mined under 30 s; `[eu-flag] event=respawned tier=<tier> x=<x> y=<y>` when the respawn fires.
 
 ## Achievements
 
@@ -295,6 +279,7 @@ Storage layout is versioned via `storage.schema_version`. The framework lives in
 - `Migration.on_init()` runs from `control.lua`'s `script.on_init` **before** any other module's `on_init`. It sets `storage.schema_version = LATEST_VERSION` (currently `0`).
 - `Migration.on_configuration_changed()` runs from `control.lua`'s `script.on_configuration_changed` **before** any other module's `on_configuration_changed`. It walks `migrations[from]` for `from = current..LATEST-1`, each mutating storage and bumping the version by one.
 - New migrations append to the `migrations` table in `script/migration.lua`. Never remove an entry. Bump `LATEST_VERSION` whenever the persisted layout changes incompatibly.
+- Telemetry: `[migration] event=initialised version=<N>` from `Migration.on_init`; `[migration] event=running from=<N> to=<N+1>` for each migration step in `on_configuration_changed`.
 
 Current version: `0` (baseline). No migrations registered yet.
 
