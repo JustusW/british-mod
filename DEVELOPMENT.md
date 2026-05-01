@@ -36,10 +36,11 @@ This repository is set up for local Factorio mod development on Windows.
    powershell -ExecutionPolicy Bypass -File .\tools\tail-log.ps1
    ```
 
-5. Run a headless load check against the isolated dev profile:
+5. Run a headless load check against the isolated dev profile. By default this runs in two phases — first the dev-junction load (fast iteration), then `tools\build.ps1` produces the release zip and Factorio is re-launched against that zip in the same isolated profile. Both phases must succeed. Pass `-SkipBuild` to run only the dev-junction phase for tighter iteration loops.
 
    ```powershell
    powershell -ExecutionPolicy Bypass -File .\tools\check-load.ps1
+   powershell -ExecutionPolicy Bypass -File .\tools\check-load.ps1 -SkipBuild
    ```
 
 6. Run a headless runtime smoke test that creates a save and advances it a few ticks:

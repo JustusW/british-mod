@@ -124,19 +124,20 @@ $includes = @(
   "data.lua",
   "data-updates.lua",
   "control.lua",
-  "shared.lua",
-  "changelog.txt",
+  "settings.lua",
   "readme.md",
   "requirements.md",
-  "data",
+  "prototypes",
   "script",
   "locale"
 )
 
 # Optional files: copied if present, ignored otherwise. Useful for assets
-# (thumbnail.png) and graphics directories that might land later.
+# (thumbnail.png), graphics, sound, and changelog.txt which is desirable for
+# the mod portal but not required during pre-release iteration.
 $optional = @(
   "thumbnail.png",
+  "changelog.txt",
   "graphics",
   "sound"
 )
