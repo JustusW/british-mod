@@ -3,3 +3,4 @@
 -- prototypes are guaranteed loaded.
 
 require("prototypes.updates.pistol")
+require("prototypes.updates.character")
