@@ -1,7 +1,10 @@
 -- EU Flag entity. Dropped by biters / spitters on death. Mined by hand only
--- (script blocks robot mining). Five tiered prototypes ship; if the player
--- mines a flag in less than 30 seconds, the next-tier (1.5× bigger / slower)
--- flag is re-planted at the same spot.
+-- — the "not-deconstructable" entity flag stops the deconstruction planner
+-- from accepting the flag, which means no order is ever raised and no robot
+-- is dispatched. Hand-mining via the regular mine input is unaffected.
+-- Five tiered prototypes ship; if the player mines a flag in less than 30
+-- seconds, the next-tier (1.5× bigger / slower) flag is re-planted at the
+-- same spot.
 local Placeholder = require("prototypes.placeholder")
 
 local TIER_COUNT = 5
@@ -20,7 +23,7 @@ for tier = 1, TIER_COUNT do
         name = name,
         icon = Placeholder.icon_path(),
         icon_size = 64,
-        flags = { "placeable-neutral", "player-creation", "not-rotatable", "not-on-map" },
+        flags = { "placeable-neutral", "player-creation", "not-rotatable", "not-on-map", "not-deconstructable" },
         max_health = 100,
         collision_box = { { -0.3 * scale * 2, -0.3 * scale * 2 }, { 0.3 * scale * 2, 0.3 * scale * 2 } },
         selection_box = { { -0.5 * scale * 2, -0.5 * scale * 2 }, { 0.5 * scale * 2, 0.5 * scale * 2 } },
