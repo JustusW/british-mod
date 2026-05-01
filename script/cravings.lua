@@ -14,8 +14,8 @@ local STAGE_CRAVING = "craving"
 local STAGE_CRAVEN = "craven"
 
 local CRAVING_TICKS = 60 * 60               -- 1 minute @ 60 ticks/s
-local SATIATED_MIN_MULTIPLIER = 5
-local SATIATED_MAX_MULTIPLIER = 10
+local SATIATED_BASE_TICKS = 60 * 60 * 5     -- 5 minutes minimum
+local SATIATED_RANDOM_RANGE_TICKS = 60 * 60 * 5  -- + random 0-5 minutes on top
 local CHECK_INTERVAL = 60                   -- check stage transitions once per second
 
 local FOOD_ITEMS = {
@@ -30,7 +30,7 @@ local function init_storage()
 end
 
 local function satiated_duration_ticks()
-    return CRAVING_TICKS * math.random(SATIATED_MIN_MULTIPLIER, SATIATED_MAX_MULTIPLIER)
+    return SATIATED_BASE_TICKS + math.random(0, SATIATED_RANDOM_RANGE_TICKS)
 end
 
 local function ensure_drain(player_index)
