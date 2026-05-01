@@ -1,11 +1,12 @@
 -- Food cravings (On-Tick debuff). Per-player state machine:
---   Satiated  - duration 3600 * randint(5, 10) ticks
---   Craving   - duration 3600 ticks
+--   Satiated  - duration 5 minutes base + random 0-5 minutes on top
+--   Craving   - duration 1 minute
 --   Craven    - infinite, until food is eaten
 -- Eating Cuppa Tea or Fish & Chips resets the cycle to Satiated.
--- Reaching Craven spawns a hmfea-craven-drain at the player's position to
--- impose a near-infinite electricity demand on the local power network and
--- (TODO) fires the Bloody Uncivilised achievement.
+-- While any player on a force is in Craven, every assembling-machine /
+-- furnace / lab / rocket-silo / mining-drill on that force is set inactive
+-- (factory shutdown). Restored when no Craven player remains on the force.
+-- Reaching Craven also fires the Bloody Uncivilised achievement.
 local Log = require("script.log")
 local Cravings = {}
 
@@ -18,6 +19,14 @@ local SATIATED_BASE_TICKS = 60 * 60 * 5     -- 5 minutes minimum
 local SATIATED_RANDOM_RANGE_TICKS = 60 * 60 * 5  -- + random 0-5 minutes on top
 local CHECK_INTERVAL = 60                   -- check stage transitions once per second
 
+local SHUTDOWN_TYPES = {
+    "assembling-machine",
+    "furnace",
+    "lab",
+    "rocket-silo",
+    "mining-drill",
+}
+
 local FOOD_ITEMS = {
     ["hmfea-cuppa-tea"] = true,
     ["hmfea-fish-and-chips"] = true,
@@ -27,34 +36,67 @@ local function init_storage()
     storage = storage or {}
     storage.cravings = storage.cravings or {}
     storage.cravings.players = storage.cravings.players or {}
+    storage.cravings.force_shutdowns = storage.cravings.force_shutdowns or {}
 end
 
 local function satiated_duration_ticks()
     return SATIATED_BASE_TICKS + math.random(0, SATIATED_RANDOM_RANGE_TICKS)
 end
 
-local function ensure_drain(player_index)
-    local player = game.get_player(player_index)
-    if not (player and player.valid and player.character) then return end
-    local entry = storage.cravings.players[player_index]
-    if entry.drain and entry.drain.valid then return end
-    local drain = player.surface.create_entity({
-        name = "hmfea-craven-drain",
-        position = player.position,
-        force = player.force,
-    })
-    if drain then
-        entry.drain = drain
+local function force_has_craven_player(force)
+    for _, p in pairs(force.players) do
+        local entry = storage.cravings.players[p.index]
+        if entry and entry.stage == STAGE_CRAVEN then
+            return true
+        end
     end
+    return false
 end
 
-local function remove_drain(player_index)
-    local entry = storage.cravings.players[player_index]
-    if not entry then return end
-    if entry.drain and entry.drain.valid then
-        entry.drain.destroy()
+local function shutdown_force(force)
+    if storage.cravings.force_shutdowns[force.index] then return end
+    local affected = {}
+    for _, surface in pairs(game.surfaces) do
+        for _, entity in pairs(surface.find_entities_filtered({
+            force = force,
+            type = SHUTDOWN_TYPES,
+        })) do
+            if entity.active then
+                entity.active = false
+                table.insert(affected, entity)
+            end
+        end
     end
-    entry.drain = nil
+    storage.cravings.force_shutdowns[force.index] = affected
+    Log.debug("craving", string.format(
+        "event=force_shutdown force=%d entities=%d",
+        force.index, #affected
+    ))
+end
+
+local function restore_force(force)
+    local affected = storage.cravings.force_shutdowns[force.index]
+    if not affected then return end
+    local restored = 0
+    for _, entity in pairs(affected) do
+        if entity.valid then
+            entity.active = true
+            restored = restored + 1
+        end
+    end
+    storage.cravings.force_shutdowns[force.index] = nil
+    Log.debug("craving", string.format(
+        "event=force_restored force=%d entities=%d",
+        force.index, restored
+    ))
+end
+
+local function update_force_shutdown(force)
+    if force_has_craven_player(force) then
+        shutdown_force(force)
+    else
+        restore_force(force)
+    end
 end
 
 local function set_stage(player_index, stage, current_tick)
@@ -70,7 +112,7 @@ local function set_stage(player_index, stage, current_tick)
     elseif stage == STAGE_CRAVING then
         entry.stage_ends_at = current_tick + CRAVING_TICKS
     else
-        entry.stage_ends_at = nil  -- infinite
+        entry.stage_ends_at = nil
     end
 
     if prev_stage and prev_stage ~= stage then
@@ -81,9 +123,9 @@ local function set_stage(player_index, stage, current_tick)
     end
 
     if stage == STAGE_CRAVEN then
-        ensure_drain(player_index)
         local player = game.get_player(player_index)
         if player and player.valid then
+            update_force_shutdown(player.force)
             player.unlock_achievement("hmfea-bloody-uncivilised")
             Log.debug("craving", string.format(
                 "event=achievement_fired name=hmfea-bloody-uncivilised player=%d",
@@ -91,7 +133,10 @@ local function set_stage(player_index, stage, current_tick)
             ))
         end
     elseif prev_stage == STAGE_CRAVEN then
-        remove_drain(player_index)
+        local player = game.get_player(player_index)
+        if player and player.valid then
+            update_force_shutdown(player.force)
+        end
     end
 end
 

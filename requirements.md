@@ -102,7 +102,7 @@ Every player runs a three-stage debuff cycle from the first tick. Eating Cuppa T
 
 - **Satiated** — duration **5 minutes base + a random 0–5 minutes on top** (so total 5–10 minutes, randomised per cycle). Ends with a forced random prompt: _Fish & Chips or Cuppa Tea?_
 - **Craving** — duration `3600 ticks` (one minute). Final warning window.
-- **Craven** — infinite. The factory is effectively disabled: a hidden beacon imposes an absurd electricity demand (e.g. 99,999,999,999,999,999) so nothing runs until food is consumed.
+- **Craven** — infinite. The factory is effectively disabled: every assembling machine, furnace, lab, rocket silo, and mining drill on the player's force is paused until somebody on the force eats. Originally drafted as a fake-beacon electricity drain; the implementation flips the entities' active state directly because it is reliable regardless of network coverage.
 
 Reaching Craven grants the **Bloody Uncivilised** achievement.
 

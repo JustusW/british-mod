@@ -117,7 +117,7 @@ Logs-first approach — when a feature misbehaves we read the log, we don't gues
 
 - Per-player state on `storage.players[index]` tracking `stage`, `stage_started_tick`, and `next_prompt_tick`.
 - Stage timings: Satiated `3600 × 5 + math.random(0, 3600 * 5)` ticks (5 minutes base + 0–5 minutes random), Craving `3600` ticks, Craven infinite.
-- Craven enforcement: a hidden invisible beacon attached to each player's force imposing an absurd electricity demand modifier. Beacon is created on entering Craven, destroyed on eating.
+- Craven enforcement: when any player on a force enters Craven, every entity on that force whose `type` is `assembling-machine`, `furnace`, `lab`, `rocket-silo`, or `mining-drill` and is currently active is set inactive (factory shutdown). The set of touched entities is stored on `storage.cravings.force_shutdowns[force_index]`. When the last Craven player on the force is satisfied, the same set is restored to active.
 - Eating Cuppa Tea or Fish & Chips fires `on_player_consumed_item` (or equivalent) and resets stage to Satiated.
 
 ## Vehicles & buildings
