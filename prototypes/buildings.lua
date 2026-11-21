@@ -1,6 +1,30 @@
--- Greenhouse + Woodchipper. Both are placeholder-skinned assembling machines
--- with dedicated recipe categories so only they can run their recipes.
-local Placeholder = require("prototypes.placeholder")
+-- Greenhouse + Woodchipper: assembling machines with dedicated recipe
+-- categories so only they can run their recipes. Art by ingo (stills, 3x3,
+-- scale 0.5); model credits in credits.md.
+
+local util = require("util")
+
+-- Per building: icon and still picture (file, size, shift in pixels).
+local ART = {
+    ["hmfea-greenhouse"] = { dir = "greenhouse", width = 192, height = 270, shift = { -0.18, -18.87 } },
+    ["hmfea-woodchipper"] = { dir = "woodchipper", width = 192, height = 236, shift = { 0, -10.36 } },
+}
+
+local function icon_of(name)
+    return "__hmfea__/graphics/icons/" .. ART[name].dir .. ".png"
+end
+
+local function still_of(name)
+    local a = ART[name]
+    return {
+        filename = "__hmfea__/graphics/entity/" .. a.dir .. "/" .. a.dir .. ".png",
+        width = a.width,
+        height = a.height,
+        frame_count = 1,
+        shift = util.by_pixel(a.shift[1], a.shift[2]),
+        scale = 0.5,
+    }
+end
 
 -- Recipe categories the buildings own.
 data:extend({
@@ -12,7 +36,7 @@ local function make_machine(name, category, energy)
     return {
         type = "assembling-machine",
         name = name,
-        icon = Placeholder.icon_path(),
+        icon = icon_of(name),
         icon_size = 64,
         flags = { "placeable-neutral", "placeable-player", "player-creation" },
         minable = { mining_time = 0.5, result = name },
@@ -29,7 +53,7 @@ local function make_machine(name, category, energy)
         },
         energy_usage = energy or "100kW",
         graphics_set = {
-            animation = Placeholder.animation(256),
+            animation = still_of(name),
         },
     }
 end
@@ -38,7 +62,7 @@ local function make_item(name, place_result, stack)
     return {
         type = "item",
         name = name,
-        icon = Placeholder.icon_path(),
+        icon = icon_of(name),
         icon_size = 64,
         subgroup = "production-machine",
         order = "z[" .. name .. "]",

@@ -22,6 +22,12 @@ Third-party assets used in _His Majesty's Factory Expansion Act_. This file ship
   https://sketchfab.com/3d-models/c682f885ea3f4261bfd26040811f612f — **modified**: rendered by ingo as the rocket
   (`graphics/entity/xl5-rocket/`, `graphics/icons/xl5-rocket.png`).
 
+- **"Greenhouse"** by furnisha, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), source:
+  https://sketchfab.com/3d-models/bf455e7e9c434bd0abc2351fb3d24975 — **modified**: rendered by ingo as the Greenhouse.
+- **"Yellow Industrial Wood Chipper"** by Matheus.Nini, licensed under
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), source:
+  https://sketchfab.com/3d-models/4d2b89e06e124c81b40a6541f6dab94b — **modified**: rendered by ingo as the Woodchipper.
+
 ## Factorio assets
 
 - The Avada Kedavra bolt uses Space Age's Tesla beam sprites (`graphics/entity/tesla-beam/`), © Wube Software. Used
