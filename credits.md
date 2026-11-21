@@ -46,6 +46,11 @@ https://www.youtube.com/watch?v=coo1dzoN8SE. Trimmed to one verse, mono, loudnes
 _The Italian Job_ (1969), a 3-second quotation used under fair use (parody). Source clip:
 https://www.youtube.com/watch?v=7_PX1cVuaVA (Movieclips), 20-25 s, silence trimmed.
 
+## Victory sound
+
+`sound/victory.ogg` is a 26.5-second excerpt of the "Fuck This Shit I'm Out" meme song, used under fair use
+(parody). Source: https://www.youtube.com/watch?v=9wO5TnYaJ4o, 0:50 to the silence at 1:16.
+
 ## Icons
 
 The item, technology and achievement icons are renders by ingo of free 3D models, all **modified** (recoloured,
