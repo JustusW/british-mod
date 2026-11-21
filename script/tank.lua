@@ -1,6 +1,6 @@
 -- Tank protocol: while occupying the tank, "God Save the King" plays
 -- continuously. Only mutable via global game audio settings.
--- The clip (hmfea-god-save-the-king, ASSETS A1) is a 36.5 s loop and is
+-- The clip (hmfea-god-save-the-king, ASSETS A1) is a 37.0 s loop and is
 -- restarted every LOOP_TICKS while the player stays in the tank. A playing
 -- sound can't be stopped, so leaving the tank lets the current verse finish.
 -- Without the clip, a vanilla placeholder beep plays every 5 seconds.
@@ -9,7 +9,7 @@ local Tank = {}
 
 local TANK_NAME = "tank"
 local CLIP = "hmfea-god-save-the-king"
-local LOOP_TICKS = 2190            -- 36.5 s, the clip length
+local LOOP_TICKS = 2220            -- 37.0 s, the clip length
 local PLACEHOLDER = "utility/new_objective"
 local PLACEHOLDER_TICKS = 60 * 5
 local CHECK_INTERVAL = 10
