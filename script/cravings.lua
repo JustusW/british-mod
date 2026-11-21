@@ -36,12 +36,6 @@ local SHUTDOWN_TYPES = {
 local SHUTDOWN_TYPE_SET = {}
 for _, t in ipairs(SHUTDOWN_TYPES) do SHUTDOWN_TYPE_SET[t] = true end
 
--- The food chain keeps running, otherwise Craven with no food in stock
--- could never be ended (Chips need the Woodchipper, potatoes the Greenhouse).
-local EXEMPT = {
-    ["hmfea-greenhouse"] = true,
-    ["hmfea-woodchipper"] = true,
-}
 
 local FOOD_ITEMS = {
     ["hmfea-cuppa-tea"] = true,
@@ -155,7 +149,7 @@ local function shutdown_force(force)
         })) do
             -- 2.1: LuaEntity.active is read-only; scripts pause machines via
             -- disabled_by_script. Leave ones another script already paused.
-            if not entity.disabled_by_script and not EXEMPT[entity.name] then
+            if not entity.disabled_by_script then
                 entity.disabled_by_script = true
                 table.insert(affected, entity)
             end
@@ -290,7 +284,7 @@ function Cravings.on_built(event)
     if not storage.cravings then init_storage() end
     local list = storage.cravings.force_shutdowns[e.force.index]
     if not list then return end
-    if not SHUTDOWN_TYPE_SET[e.type] or EXEMPT[e.name] or e.disabled_by_script then return end
+    if not SHUTDOWN_TYPE_SET[e.type] or e.disabled_by_script then return end
     e.disabled_by_script = true
     table.insert(list, e)
 end
