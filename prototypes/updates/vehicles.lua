@@ -103,19 +103,28 @@ local tank = data.raw.car and data.raw.car["tank"]
 if tank then
     local util = require("util")
     local dir = "__hmfea__/graphics/entity/challenger/"
-    tank.animation = { layers = { util.sprite_load(dir .. "challenger-hull", {
+    -- Colour sheet plus ingo's matching shadow sheet (<name>-shadow).
+    local function layers(name, opts)
+        local colour, shadow = {}, { draw_as_shadow = true }
+        for k, v in pairs(opts) do colour[k] = v; shadow[k] = v end
+        return { layers = {
+            util.sprite_load(dir .. name, colour),
+            util.sprite_load(dir .. name .. "-shadow", shadow),
+        } }
+    end
+    tank.animation = layers("challenger-hull", {
         frame_count = 2,
         direction_count = 64,
         animation_speed = 8,
         max_advance = 1,
         scale = 0.5,
         priority = "low",
-    }) } }
-    tank.turret_animation = { layers = { util.sprite_load(dir .. "challenger-turret", {
+    })
+    tank.turret_animation = layers("challenger-turret", {
         frame_count = 1,
         direction_count = 64,
         animation_speed = 8,
         scale = 0.5,
         priority = "low",
-    }) } }
+    })
 end
