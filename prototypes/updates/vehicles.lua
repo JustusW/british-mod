@@ -50,9 +50,38 @@ end
 -- The rocket itself (projectile flying up) -> Union Jack rocket.
 reskin_entity("rocket-silo-rocket", "rocket-silo-rocket", "hmfea.union-jack-rocket-name", "hmfea.union-jack-rocket-description")
 
--- Car -> Mini Cooper
-reskin_item("car",   "hmfea.mini-cooper-name", "hmfea.mini-cooper-description")
-reskin_entity("car", "car", "hmfea.mini-cooper-name", "hmfea.mini-cooper-description")
+-- Car -> Mini Cooper. Art by ingo: 64 dir x 2 frames + shadow, scale 0.5.
+-- Model credit in credits.md. The vanilla car's machine-gun turret sprite is
+-- dropped (a Mini has no visible gun); the car's gun itself stays vanilla.
+local MINI_ICON = "__hmfea__/graphics/icons/mini.png"
+reskin_item("car",   "hmfea.mini-cooper-name", "hmfea.mini-cooper-description", MINI_ICON)
+reskin_entity("car", "car", "hmfea.mini-cooper-name", "hmfea.mini-cooper-description", MINI_ICON)
+local car = data.raw.car and data.raw.car["car"]
+if car then
+    local util = require("util")
+    local dir = "__hmfea__/graphics/entity/mini/"
+    car.animation = { layers = {
+        util.sprite_load(dir .. "mini", {
+            frame_count = 2,
+            direction_count = 64,
+            animation_speed = 8,
+            max_advance = 0.2,
+            scale = 0.5,
+            priority = "low",
+        }),
+        util.sprite_load(dir .. "mini-shadow", {
+            frame_count = 1,
+            repeat_count = 2,
+            direction_count = 64,
+            draw_as_shadow = true,
+            animation_speed = 8,
+            max_advance = 0.2,
+            scale = 0.5,
+            priority = "low",
+        }),
+    } }
+    car.turret_animation = nil
+end
 
 -- Tank -> Challenger / Churchill. Art by ingo: Challenger 2 hull (64 dir x
 -- 2 frames) and turret (64 dir), scale 0.5, rotation centre = turret ring.

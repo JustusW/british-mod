@@ -13,6 +13,10 @@ Third-party assets used in _His Majesty's Factory Expansion Act_. This file ship
   source: https://sketchfab.com/3d-models/f7869d0d85ff4a65b2e1333ab00b25cf — **modified**: scaled and rendered by
   ingo as the tank (`graphics/entity/challenger/`).
 
+- **"Mini Cooper Mk1"** by ivan-wsk, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/),
+  source: https://sketchfab.com/3d-models/0b032262d5a34360ae55390eb23b36f7 — **modified**: rendered by ingo as the car
+  (`graphics/entity/mini/`, `graphics/icons/mini.png`).
+
 ## Factorio assets
 
 - The Avada Kedavra bolt uses Space Age's Tesla beam sprites (`graphics/entity/tesla-beam/`), © Wube Software. Used
