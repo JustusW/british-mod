@@ -17,11 +17,4 @@ return {
     "blobby-consolation",
     "win-suppressed",
     "teacup-broken",
-    "research-wand",
-    "research-petrificus",
-    "research-abra-kadabra",
-    "research-avada-kedavra",
-    "research-philosophers-stone",
-    "research-truthbomb",
-    "research-mr-blobby",
 }
