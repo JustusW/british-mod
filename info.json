@@ -4,7 +4,7 @@
     "title": "His Majesty's Factory Expansion Act",
     "author": "Justus & Mission",
     "factorio_version": "2.1",
-    "dependencies": ["base >= 2.1", "! space-age"],
+    "dependencies": ["base >= 2.1", "! space-age", "! quality", "! recycler"],
     "description": "Perchance the most quintessentially British mod in the annals of existence.\n\nMade with love from Germany and South Africa <3",
     "spoiling_required": true
 }
