@@ -27,7 +27,7 @@ function Icons.apply_mod()
         set("item", "hmfea-" .. short, ICON .. short .. ".png", 64)
     end
     for _, short in ipairs({
-        "cuppa-tea", "fish-and-chips", "spell-petrificus-totalus", "spell-abra-kadabra", "spell-avada-kedavra",
+        "cuppa-tea", "emergency-tea", "fish-and-chips", "spell-petrificus-totalus", "spell-abra-kadabra", "spell-avada-kedavra",
     }) do
         set("capsule", "hmfea-" .. short, ICON .. short .. ".png", 64)
     end
@@ -50,6 +50,12 @@ function Icons.apply_vanilla()
     -- Baton (vanilla grenade) and Musket (vanilla submachine gun).
     set("capsule", "grenade", ICON .. "baton.png", 64)
     set("gun", "submachine-gun", ICON .. "musket.png", 64)
+
+    -- Rambo heads (biters) and Rambo with weapon (spitters), one per age.
+    for size, age in pairs({ small = "toddler", medium = "child", big = "teen", behemoth = "adult" }) do
+        set("unit", size .. "-biter", ICON .. "rambo-" .. age .. ".png", 64)
+        set("unit", size .. "-spitter", ICON .. "rambo-thrower-" .. age .. ".png", 64)
+    end
 end
 
 return Icons
