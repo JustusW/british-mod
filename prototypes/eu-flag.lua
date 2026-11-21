@@ -5,9 +5,12 @@
 -- Five tiered prototypes ship; if the player mines a flag in less than 30
 -- seconds, the next-tier (1.5× bigger / slower) flag is re-planted at the
 -- same spot.
-local Placeholder = require("prototypes.placeholder")
-
 local TIER_COUNT = 5
+-- Art by ingo: 128x128 still (graphics/entity/eu-flag/eu-flag.png). Drawn at
+-- half the tier scale so its on-screen size equals the selection box
+-- (tier 1 = 1 tile, x1.5 per tier).
+local PICTURE_SIZE = 128
+local PICTURE_SCALE_FACTOR = 0.5
 local BASE_MINING_TIME = 15  -- seconds at mining speed 1; the character mines at 0.5 -> 30 s by hand
 local TIME_FACTOR = 1.5
 local BASE_SCALE = 0.5
@@ -21,7 +24,7 @@ for tier = 1, TIER_COUNT do
     local proto = {
         type = "simple-entity-with-owner",
         name = name,
-        icon = Placeholder.icon_path(),
+        icon = "__hmfea__/graphics/icons/eu-flag.png",
         icon_size = 64,
         flags = { "placeable-neutral", "player-creation", "not-rotatable", "not-on-map", "not-deconstructable" },
         max_health = 100,
@@ -32,11 +35,11 @@ for tier = 1, TIER_COUNT do
             results = {},
         },
         picture = {
-            filename = "__hmfea__/graphics/placeholder/checkerboard-64.png",
+            filename = "__hmfea__/graphics/entity/eu-flag/eu-flag.png",
             priority = "extra-high",
-            width = 64,
-            height = 64,
-            scale = scale,
+            width = PICTURE_SIZE,
+            height = PICTURE_SIZE,
+            scale = scale * PICTURE_SCALE_FACTOR,
         },
         render_layer = "object",
     }
