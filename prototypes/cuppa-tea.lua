@@ -227,3 +227,19 @@ data:extend({
         results = { { type = "item", name = "hmfea-cuppa-tea", amount = 1 } },
     },
 })
+
+-- Emergency Teatime: the guaranteed way out of Craven. Hand-craft only, 60 s,
+-- 10 wood -> 1 Cuppa Tea. script/teatime.lua plays an annoying sound for the
+-- whole craft.
+data:extend({
+    {
+        type = "recipe",
+        name = "hmfea-emergency-teatime",
+        enabled = true,
+        categories = { "hmfea-hand-only" },
+        energy_required = 60,
+        ingredients = { { type = "item", name = "wood", amount = 10 } },
+        results = { { type = "item", name = "hmfea-cuppa-tea", amount = 1 } },
+        order = "a-a-z[hmfea-emergency-teatime]",
+    },
+})
