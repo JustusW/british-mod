@@ -1,10 +1,10 @@
 return
 {
-  width = 207,
-  height = 89,
-  shift = util.by_pixel(26.18, 3.73),
+  width = 205,
+  height = 91,
+  shift = util.by_pixel(26.61, 4.82),
   line_length = 19,
-  lines_per_file = 46,
+  lines_per_file = 45,
   frame_count = 22,
   direction_count = 8,
   draw_as_shadow = true,
