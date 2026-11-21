@@ -6,9 +6,13 @@
 -- adult. Sheets are rendered at final size (64 px/tile), so every tier uses
 -- scale 0.5 with no per-tier scaling and no tint masks.
 --   biters   : run + melee attack (weapon as a club)
---   spitters : run (same sheets) + throw; the acid stream keeps its damage,
---              splash and sticker, but its flying blob is replaced by the
---              tier's tumbling weapon, launched from ingo's release points.
+--   spitters : run (same sheets) + throw; the acid stream's flying blob is
+--              replaced by the tier's tumbling weapon, launched from ingo's
+--              release points. Where it lands the weapon lies on the floor
+--              (a corpse, 30 s) instead of an acid puddle; no slowdown sticker.
+--              The puddle's damage moves to the impact (about one second of
+--              puddle: splash damage per tick x 60), for characters and units
+--              only, as the puddle was; buildings take vanilla impact damage.
 -- Deaths: the die animation sits on the <size>-biter/-spitter-corpse; it plays
 -- once (vanilla dying_speed, same frame counts as vanilla: 17 / 15) and the
 -- last frame stays as the corpse. No decay animation.
@@ -28,6 +32,84 @@ local TIERS = {
 local DISTANCE_PER_FRAME = { toddler = 0.123, child = 0.197, teen = 0.268, adult = 0.333 }
 
 -- Colour sheet plus ingo's matching shadow sheet (<path>-shadow, same layout).
+-- The thrown weapon lying where it landed: one still per tumble frame, picked
+-- at random, so the weapons lie at different angles.
+local DROPPED_SECONDS = 30
+
+local function dropped_weapon(age)
+    local meta = require(DIR .. "rambo-thrower/" .. age .. "/weapon-flying")
+    local w, h = meta.width, meta.height
+    local variations = {}
+    for i = 0, 14 do
+        table.insert(variations, {
+            filename = DIR .. "rambo-thrower/" .. age .. "/weapon-flying-1.png",
+            width = w, height = h, x = w * i, y = 0,
+            frame_count = 1, direction_count = 1, scale = 0.5,
+        })
+    end
+    local name = "hmfea-dropped-weapon-" .. age
+    data:extend({ {
+        type = "corpse",
+        name = name,
+        flags = { "placeable-off-grid", "not-on-map" },
+        hidden = true,
+        selectable_in_game = false,
+        time_before_removal = DROPPED_SECONDS * 60,
+        final_render_layer = "corpse",
+        animation = variations,
+    } })
+    return name
+end
+
+-- Swap the acid puddle for the dropped weapon, drop the slowdown sticker and
+-- put the puddle's damage on the impact.
+local function weapon_instead_of_acid(stream, age)
+    local fire_name
+    for _, action in pairs(stream.initial_action or {}) do
+        local effects = action.action_delivery and action.action_delivery.target_effects
+        for i = #(effects or {}), 1, -1 do
+            local e = effects[i]
+            if e.type == "create-fire" then
+                fire_name = e.entity_name
+                effects[i] = {
+                    type = "create-entity",
+                    entity_name = dropped_weapon(age),
+                    tile_collision_mask = e.tile_collision_mask,
+                }
+            elseif e.type == "create-sticker" then
+                table.remove(effects, i)
+            end
+        end
+    end
+    local fire = fire_name and data.raw.fire[fire_name]
+    local per_tick = 0
+    if fire and fire.on_damage_tick_effect then
+        local d = fire.on_damage_tick_effect.action_delivery
+        for _, e in pairs(d and d.target_effects or {}) do
+            if e.type == "damage" then per_tick = e.damage.amount end
+        end
+    end
+    -- Like the puddle, this extra damage only hits characters and units
+    -- ("ground-unit"); buildings keep the vanilla impact damage.
+    local area
+    for _, action in pairs(stream.initial_action or {}) do
+        if action.type == "area" then area = action end
+    end
+    if area and per_tick > 0 then
+        table.insert(stream.initial_action, {
+            type = "area",
+            radius = area.radius,
+            force = area.force,
+            ignore_collision_condition = true,
+            trigger_target_mask = { "ground-unit" },
+            action_delivery = { type = "instant", target_effects = {
+                { type = "damage", damage = { amount = per_tick * 60, type = "acid" } },
+            } },
+        })
+    end
+    stream.working_sound = nil  -- the acid burn loop
+end
+
 local function rotated(path, frame_count, extra)
     local function opts(shadow)
         local o = {
@@ -112,7 +194,7 @@ for _, tier in ipairs(TIERS) do
         set_death(spitter, DIR .. "rambo-thrower/" .. age .. "/rambo-die", 15)
 
         -- The stream this spitter fires: one tumbling weapon instead of a
-        -- jet of acid blobs. Damage, splash and sticker are left as they are.
+        -- jet of acid blobs; it lands on the floor instead of an acid puddle.
         local stream_name = ap.ammo_type and ap.ammo_type.action
             and ap.ammo_type.action.action_delivery
             and ap.ammo_type.action.action_delivery.stream
@@ -132,6 +214,7 @@ for _, tier in ipairs(TIERS) do
             stream.particle_alpha_per_part = 1
             stream.particle_scale_per_part = 1
             stream.particle_start_alpha = 1
+            weapon_instead_of_acid(stream, age)
         end
     end
 end
