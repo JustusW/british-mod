@@ -28,6 +28,12 @@ Third-party assets used in _His Majesty's Factory Expansion Act_. This file ship
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), source:
   https://sketchfab.com/3d-models/4d2b89e06e124c81b40a6541f6dab94b — **modified**: rendered by ingo as the Woodchipper.
 
+## Voices
+
+All spoken lines are text-to-speech renders by ingo in a voice cloned from a LibriVox reader of the
+"LibriVox Dialect and Accent Collection Vol. 1" (https://archive.org/details/dialect_accent_0909_librivox), which is in
+the **public domain**.
+
 ## Icons
 
 The item, technology and achievement icons are renders by ingo of free 3D models, all **modified** (recoloured,

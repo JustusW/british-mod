@@ -1,6 +1,7 @@
--- Emergency Teatime: while a player is hand-crafting hmfea-emergency-teatime,
--- an annoying sound plays to them once a second. Placeholder until the clip
--- (ASSETS A5, sound prototype hmfea-emergency-teatime) exists.
+-- Emergency Teatime: when a player starts hand-crafting hmfea-emergency-teatime,
+-- the ~60 s rant (hmfea-emergency-teatime, ASSETS A5) plays once to them. A
+-- playing sound can't be stopped, so cancelling the craft doesn't cut it off.
+-- Without the clip, a placeholder buzz plays once a second instead.
 local Log = require("script.log")
 local Teatime = {}
 
@@ -22,10 +23,14 @@ function Teatime.on_tick(event)
     local path = helpers.is_valid_sound_path(CLIP) and CLIP or PLACEHOLDER
     for _, player in pairs(game.connected_players) do
         if crafting_teatime(player) then
-            player.play_sound({ path = path })
-            if not storage.teatime[player.index] then
+            local started = not storage.teatime[player.index]
+            if started then
                 storage.teatime[player.index] = true
                 Log.debug("teatime", string.format("event=crafting player=%d", player.index))
+            end
+            -- The rant once per craft; the placeholder every second.
+            if path == PLACEHOLDER or started then
+                player.play_sound({ path = path })
             end
         else
             storage.teatime[player.index] = nil

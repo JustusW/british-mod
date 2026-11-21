@@ -12,4 +12,6 @@ require("prototypes.updates.biters")
 require("prototypes.updates.rambo")  -- after biters: real art replaces the placeholder icons
 require("prototypes.updates.gentleman")
 require("prototypes.updates.tank-prereq")
+-- Victory jingle replaced (ASSETS A3).
+data.raw["utility-sounds"]["default"].game_won = { filename = "__hmfea__/sound/victory.ogg", volume = 1.0 }
 require("prototypes.icons").apply_vanilla()  -- last: Baton and Musket icons
