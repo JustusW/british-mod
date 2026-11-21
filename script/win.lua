@@ -10,6 +10,7 @@
 -- Audio is unchanged — see design.md "Audio". The victory jingle replacement
 -- (if any) ships separately via the utility-sounds override.
 local Log = require("script.log")
+local Voice = require("script.voice")
 local Win = {}
 
 local PAYLOAD_NAME = "hmfea-mr-blobby"
@@ -60,6 +61,7 @@ function Win.on_cargo_pod_finished_ascending(event)
         for _, p in pairs(force.players) do
             if p.connected then
                 p.print({ "hmfea.win-suppressed" })
+                Voice.say(p, "win-suppressed")
             end
         end
         return
@@ -79,6 +81,7 @@ function Win.on_cargo_pod_finished_ascending(event)
     for _, p in pairs(force.players) do
         if p.connected then
             p.print({ key })
+            Voice.say(p, (key:gsub("^hmfea%.", "")))
         end
     end
 

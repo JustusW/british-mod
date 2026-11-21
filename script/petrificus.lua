@@ -9,6 +9,7 @@
 -- - Unit target (biter / spitter) -> stop command issued at maximum
 --   ticks_to_wait. Persists with the unit's saved state.
 local Log = require("script.log")
+local Voice = require("script.voice")
 local Petrificus = {}
 
 local PETRIFY_RADIUS = 2.5
@@ -87,6 +88,7 @@ local function petrify_player(player)
     local group = get_or_create_petrify_group()
     group.add_player(player)
     player.print({ "hmfea.petrified-player" })
+    Voice.say(player, "petrified-player")
     Log.debug("petrificus", string.format(
         "event=petrified target=player player=%d",
         player.index

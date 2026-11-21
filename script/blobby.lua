@@ -9,6 +9,7 @@
 --   and the consolation message persists for the rest of the run.
 -- - You Whimp achievement fires on the first true -> false flip during a run.
 local Log = require("script.log")
+local Voice = require("script.voice")
 local Blobby = {}
 
 local SETTING_NAME = "hmfea-enable-mr-blobby"
@@ -105,6 +106,7 @@ function Blobby.on_runtime_mod_setting_changed(event)
     ))
     if now_off then
         game.print({ "hmfea.blobby-flipped-off" })
+        Voice.say(game, "blobby-flipped-off")
         -- First true -> false flip during a running game earns You Whimp.
         if not storage.blobby.ever_flipped_off_during_run then
             storage.blobby.ever_flipped_off_during_run = true
@@ -116,8 +118,10 @@ function Blobby.on_runtime_mod_setting_changed(event)
         evaluate_all_forces()
     elseif next(storage.blobby.auto_granted) then
         game.print({ "hmfea.blobby-flipped-on-too-late" })
+        Voice.say(game, "blobby-flipped-on-too-late")
     else
         game.print({ "hmfea.blobby-flipped-on" })
+        Voice.say(game, "blobby-flipped-on")
     end
 end
 

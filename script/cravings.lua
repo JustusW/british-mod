@@ -10,6 +10,7 @@
 -- the force; one player eating feeds every Craven player on the force.
 -- Reaching Craven also fires the Bloody Uncivilised achievement.
 local Log = require("script.log")
+local Voice = require("script.voice")
 local Cravings = {}
 
 local STAGE_SATIATED = "satiated"
@@ -245,9 +246,11 @@ function Cravings.on_tick(event)
             if entry.stage == STAGE_SATIATED then
                 set_stage(player.index, STAGE_CRAVING, event.tick)
                 player.print({ "hmfea.craving-start" })
+                Voice.say(player, "craving-start")
             elseif entry.stage == STAGE_CRAVING then
                 set_stage(player.index, STAGE_CRAVEN, event.tick)
                 player.print({ "hmfea.craven-start" })
+                Voice.say(player, "craven-start")
             end
         end
         update_hud(player, storage.cravings.players[player.index], event.tick)
@@ -286,6 +289,7 @@ function Cravings.on_player_used_capsule(event)
     set_stage(event.player_index, STAGE_SATIATED, game.tick)
     if player and player.valid then
         player.print({ "hmfea.cravings-reset" })
+        Voice.say(player, "cravings-reset")
     end
 end
 

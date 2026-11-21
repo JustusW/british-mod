@@ -2,6 +2,7 @@
 -- Enforced via a single helper called from every relevant hook so save loads
 -- and mid-game mod adds also enforce the rule retroactively.
 local Log = require("script.log")
+local Voice = require("script.voice")
 local Exoskeleton = {}
 
 local FORBIDDEN_EQUIPMENT = "exoskeleton-equipment"
@@ -27,6 +28,7 @@ local function enforce_no_exoskeleton(player)
     if not (player and player.valid and player.character) then return end
     if has_exoskeleton(player) then
         player.print({ "hmfea.officers-dont-run" })
+        Voice.say(player, "officers-dont-run")
         Log.debug("exoskeleton", string.format(
             "event=killed player=%d",
             player.index

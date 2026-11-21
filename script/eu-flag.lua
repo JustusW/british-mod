@@ -5,6 +5,7 @@
 -- mining-speed upgrades) trigger a respawn at the next tier (1.5× bigger /
 -- slower), capped at tier 5.
 local Log = require("script.log")
+local Voice = require("script.voice")
 local EuFlag = {}
 
 local FLAG_TIER_COUNT = 5
@@ -149,6 +150,7 @@ function EuFlag.on_pre_player_mined_item(event)
     -- Notify the player that their cleverness has been noted.
     local player = game.get_player(event.player_index)
     if player and player.valid then
+        Voice.say(player, "eu-flag-respawn")
         player.create_local_flying_text({
             text = { "hmfea.eu-flag-respawn" },
             position = entity.position,

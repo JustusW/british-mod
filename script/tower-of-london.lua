@@ -4,6 +4,7 @@
 -- sentence by moving the player into a permission group that blocks every
 -- input action.
 local Log = require("script.log")
+local Voice = require("script.voice")
 local TOL = {}
 
 local SENTENCE_TICKS = 60 * 60      -- 60 seconds @ 60 ticks/s
@@ -54,6 +55,7 @@ local function sentence(player, current_tick)
     jail.add_player(player)
 
     player.print({ "hmfea.tower-of-london-sentenced" })
+    Voice.say(player, "tower-of-london-sentenced")
     Log.debug("tower-of-london", string.format(
         "event=sentenced player=%d ticks=%d",
         player.index, SENTENCE_TICKS
@@ -74,6 +76,7 @@ local function release(player_index)
             target.add_player(player)
         end
         player.print({ "hmfea.tower-of-london-released" })
+        Voice.say(player, "tower-of-london-released")
     end
     storage.tower_of_london.sentenced[player_index] = nil
     Log.debug("tower-of-london", string.format(

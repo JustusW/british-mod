@@ -15,4 +15,5 @@ require("prototypes.achievements")
 require("prototypes.spells")
 require("prototypes.technology")
 require("prototypes.recipes")
+require("prototypes.voice")
 require("prototypes.icons").apply_mod()  -- last: real icons replace placeholders

@@ -4,6 +4,7 @@
 -- intercepted, the player is reminded of their station, and the shooting
 -- state is reset.
 local Log = require("script.log")
+local Voice = require("script.voice")
 local Pistol = {}
 
 local THROTTLE_TICKS = 60  -- rate-limit the rebuke message per player
@@ -39,6 +40,7 @@ function Pistol.on_tick(event)
                     if gun_stack and gun_stack.valid_for_read and gun_stack.name == "pistol" then
                         local prev = last[player.index] or -math.huge
                         if tick - prev >= THROTTLE_TICKS then
+                            Voice.say(player, "pillock-rebuke")
                             player.create_local_flying_text({
                                 text = { "hmfea.pillock-rebuke" },
                                 position = player.position,
