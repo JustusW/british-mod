@@ -52,8 +52,26 @@ local HUD_COLORS = {
     [STAGE_CRAVEN] = { r = 1.0, g = 0.2, b = 0.2 },
 }
 
+-- Game alerts in the alert bar while Craving / Craven. Refreshed with the
+-- indicator once per second; removed again on Satiated.
+local ALERTS = {
+    [STAGE_CRAVING] = { icon = { type = "item", name = "raw-fish" }, message = { "hmfea.alert-craving" } },
+    [STAGE_CRAVEN] = { icon = { type = "virtual", name = "signal-skull" }, message = { "hmfea.alert-craven" } },
+}
+
+local function update_alert(player, stage)
+    local character = player.character
+    if not (character and character.valid) then return end
+    player.remove_alert({ entity = character, type = defines.alert_type.custom })
+    local alert = ALERTS[stage]
+    if alert then
+        player.add_custom_alert(character, alert.icon, alert.message, false)
+    end
+end
+
 local function update_hud(player, entry, tick)
     if not (player and player.valid and player.connected and entry and entry.stage) then return end
+    update_alert(player, entry.stage)
     local label = player.gui.top[HUD_NAME]
     if not (label and label.valid) then
         label = player.gui.top.add({ type = "label", name = HUD_NAME })

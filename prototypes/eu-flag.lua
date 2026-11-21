@@ -22,11 +22,13 @@ for tier = 1, TIER_COUNT do
     local mining_time = BASE_MINING_TIME * TIME_FACTOR ^ (tier - 1)
     local scale = BASE_SCALE * SCALE_FACTOR ^ (tier - 1)
     local proto = {
-        type = "simple-entity-with-owner",
+        -- Rock-like simple-entity without "player-creation": mined with the
+        -- pickaxe swing like a rock, not picked up like a building.
+        type = "simple-entity",
         name = name,
         icon = "__hmfea__/graphics/icons/eu-flag.png",
         icon_size = 64,
-        flags = { "placeable-neutral", "player-creation", "not-rotatable", "not-on-map", "not-deconstructable" },
+        flags = { "placeable-neutral", "not-rotatable", "not-on-map", "not-deconstructable" },
         max_health = 100,
         collision_box = { { -0.3 * scale * 2, -0.3 * scale * 2 }, { 0.3 * scale * 2, 0.3 * scale * 2 } },
         selection_box = { { -0.5 * scale * 2, -0.5 * scale * 2 }, { 0.5 * scale * 2, 0.5 * scale * 2 } },

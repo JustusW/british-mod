@@ -106,9 +106,11 @@ function EuFlag.on_tick(event)
         local stored = mining_starts[player.index]
 
         if is_mining and selected and selected.valid and tier_of(selected.name) then
-            if not stored or stored.unit_number ~= selected.unit_number then
+            -- Flags are rock-like simple-entities (no unit_number), so the
+            -- record keeps the entity itself and compares references.
+            if not stored or stored.entity ~= selected then
                 mining_starts[player.index] = {
-                    unit_number = selected.unit_number,
+                    entity = selected,
                     start_tick = event.tick,
                 }
             end
@@ -127,7 +129,7 @@ function EuFlag.on_pre_player_mined_item(event)
 
     init_storage()
     local stored = storage.eu_flag.mining_starts[event.player_index]
-    if not stored or stored.unit_number ~= entity.unit_number then return end
+    if not stored or stored.entity ~= entity then return end
 
     local elapsed = game.tick - stored.start_tick
     if elapsed >= MIN_MINING_TICKS - MINING_SLACK_TICKS then return end
