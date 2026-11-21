@@ -54,6 +54,28 @@ reskin_entity("rocket-silo-rocket", "rocket-silo-rocket", "hmfea.union-jack-rock
 reskin_item("car",   "hmfea.mini-cooper-name", "hmfea.mini-cooper-description")
 reskin_entity("car", "car", "hmfea.mini-cooper-name", "hmfea.mini-cooper-description")
 
--- Tank -> Challenger / Churchill
+-- Tank -> Challenger / Churchill. Art by ingo: Challenger 2 hull (64 dir x
+-- 2 frames) and turret (64 dir), scale 0.5, rotation centre = turret ring.
+-- Model credit in credits.md. Vanilla lights stay; no shadow sheet yet.
 reskin_item("tank",   "hmfea.tank-name", "hmfea.tank-description")
 reskin_entity("car",  "tank", "hmfea.tank-name", "hmfea.tank-description")
+local tank = data.raw.car and data.raw.car["tank"]
+if tank then
+    local util = require("util")
+    local dir = "__hmfea__/graphics/entity/challenger/"
+    tank.animation = { layers = { util.sprite_load(dir .. "challenger-hull", {
+        frame_count = 2,
+        direction_count = 64,
+        animation_speed = 8,
+        max_advance = 1,
+        scale = 0.5,
+        priority = "low",
+    }) } }
+    tank.turret_animation = { layers = { util.sprite_load(dir .. "challenger-turret", {
+        frame_count = 1,
+        direction_count = 64,
+        animation_speed = 8,
+        scale = 0.5,
+        priority = "low",
+    }) } }
+end
