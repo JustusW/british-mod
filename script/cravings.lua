@@ -5,7 +5,9 @@
 -- Eating Cuppa Tea or Fish & Chips resets the cycle to Satiated.
 -- While any player on a force is in Craven, every assembling-machine /
 -- furnace / lab / rocket-silo / mining-drill on that force is set inactive
--- (factory shutdown). Restored when no Craven player remains on the force.
+-- (factory shutdown), except the Greenhouse and Woodchipper so food can
+-- still be made. Machines built during Craven are paused too. Restored when no Craven player remains on
+-- the force; one player eating feeds every Craven player on the force.
 -- Reaching Craven also fires the Bloody Uncivilised achievement.
 local Log = require("script.log")
 local Cravings = {}
@@ -25,6 +27,16 @@ local SHUTDOWN_TYPES = {
     "lab",
     "rocket-silo",
     "mining-drill",
+}
+
+local SHUTDOWN_TYPE_SET = {}
+for _, t in ipairs(SHUTDOWN_TYPES) do SHUTDOWN_TYPE_SET[t] = true end
+
+-- The food chain keeps running, otherwise Craven with no food in stock
+-- could never be ended (Chips need the Woodchipper, potatoes the Greenhouse).
+local EXEMPT = {
+    ["hmfea-greenhouse"] = true,
+    ["hmfea-woodchipper"] = true,
 }
 
 local FOOD_ITEMS = {
@@ -63,7 +75,7 @@ local function shutdown_force(force)
         })) do
             -- 2.1: LuaEntity.active is read-only; scripts pause machines via
             -- disabled_by_script. Leave ones another script already paused.
-            if not entity.disabled_by_script then
+            if not entity.disabled_by_script and not EXEMPT[entity.name] then
                 entity.disabled_by_script = true
                 table.insert(affected, entity)
             end
@@ -185,9 +197,32 @@ function Cravings.on_tick(event)
     end
 end
 
+-- Machines built while their force is Craven are paused as well and join
+-- the force's shutdown list, so they are restored with the rest.
+function Cravings.on_built(event)
+    local e = event.entity
+    if not (e and e.valid) then return end
+    if not storage.cravings then init_storage() end
+    local list = storage.cravings.force_shutdowns[e.force.index]
+    if not list then return end
+    if not SHUTDOWN_TYPE_SET[e.type] or EXEMPT[e.name] or e.disabled_by_script then return end
+    e.disabled_by_script = true
+    table.insert(list, e)
+end
+
 function Cravings.on_player_used_capsule(event)
     if not (event.item and FOOD_ITEMS[event.item.name]) then return end
     local player = game.get_player(event.player_index)
+    -- One eater is enough: every Craven player on the force (online or not)
+    -- is fed too, so the force's factory comes back.
+    if player and player.valid then
+        for _, p in pairs(player.force.players) do
+            local entry = storage.cravings.players[p.index]
+            if p.index ~= event.player_index and entry and entry.stage == STAGE_CRAVEN then
+                set_stage(p.index, STAGE_SATIATED, game.tick)
+            end
+        end
+    end
     set_stage(event.player_index, STAGE_SATIATED, game.tick)
     if player and player.valid then
         player.print({ "hmfea.cravings-reset" })

@@ -42,7 +42,7 @@ local function grant(force)
     local tech = force.technologies[TECH_NAME]
     if not tech then return false end
     if tech.researched then
-        storage.blobby.auto_granted[force.index] = storage.blobby.auto_granted[force.index] or true
+        -- Researched by the force itself: no auto-grant fired.
         storage.blobby.pending_auto_grant[force.index] = nil
         return false
     end
@@ -61,11 +61,8 @@ local function evaluate_force(force)
     local tech = force.technologies[TECH_NAME]
     if not tech then return end
     if tech.researched then
-        -- Already researched (manually or auto). Mark sticky if the setting is
-        -- currently off — otherwise leave it alone.
-        if setting_off() then
-            storage.blobby.auto_granted[force.index] = storage.blobby.auto_granted[force.index] or true
-        end
+        -- Already researched. auto_granted is only ever set by grant() when
+        -- the script itself flips researched, so leave it alone here.
         return
     end
     if not setting_off() then return end
@@ -107,6 +104,7 @@ function Blobby.on_runtime_mod_setting_changed(event)
         tostring(not now_off), tostring(now_off)
     ))
     if now_off then
+        game.print({ "hmfea.blobby-flipped-off" })
         -- First true -> false flip during a running game earns You Whimp.
         if not storage.blobby.ever_flipped_off_during_run then
             storage.blobby.ever_flipped_off_during_run = true
@@ -116,6 +114,10 @@ function Blobby.on_runtime_mod_setting_changed(event)
             Log.debug("mr-blobby", "event=achievement_fired name=hmfea-you-whimp")
         end
         evaluate_all_forces()
+    elseif next(storage.blobby.auto_granted) then
+        game.print({ "hmfea.blobby-flipped-on-too-late" })
+    else
+        game.print({ "hmfea.blobby-flipped-on" })
     end
 end
 

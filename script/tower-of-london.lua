@@ -66,7 +66,9 @@ local function release(player_index)
     if not entry then return end
     local player = game.get_player(player_index)
     if player and player.valid then
-        local target_name = entry.original_group or "Default"
+        -- A player petrified during the sentence stays petrified.
+        local target_name = (storage.petrificus and storage.petrificus.players[player_index])
+            and "hmfea-petrified-player" or entry.original_group or "Default"
         local target = game.permissions.get_group(target_name) or game.permissions.get_group("Default")
         if target then
             target.add_player(player)

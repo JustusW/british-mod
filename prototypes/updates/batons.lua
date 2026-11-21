@@ -16,6 +16,8 @@ end
 -- area-radius effects to 1 tile (engineer footprint).
 local function shrink_area(node)
     if type(node) ~= "table" then return end
+    -- 2.1 base gives the grenade's action as a plain array of triggers.
+    for _, sub in ipairs(node) do shrink_area(sub) end
     if node.type == "area" and node.radius then
         node.radius = 1.0
     end
@@ -37,3 +39,23 @@ local grenade_proj = data.raw["projectile"] and data.raw["projectile"]["grenade"
 if grenade_proj and grenade_proj.action then
     shrink_area(grenade_proj.action)
 end
+
+-- Tech order per spec: Batons at Military 1, Musket at Military 2. Vanilla
+-- 2.1 has it the other way round (military -> submachine-gun,
+-- military-2 -> grenade), so swap the two unlock-recipe effects.
+local function move_unlock(recipe, from_name, to_name)
+    local from = data.raw.technology[from_name]
+    local to = data.raw.technology[to_name]
+    if not (from and to and from.effects) then return end
+    for i, effect in ipairs(from.effects) do
+        if effect.type == "unlock-recipe" and effect.recipe == recipe then
+            table.remove(from.effects, i)
+            to.effects = to.effects or {}
+            table.insert(to.effects, { type = "unlock-recipe", recipe = recipe })
+            return
+        end
+    end
+end
+
+move_unlock("submachine-gun", "military", "military-2")
+move_unlock("grenade", "military-2", "military")

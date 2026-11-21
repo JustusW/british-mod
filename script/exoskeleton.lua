@@ -41,6 +41,9 @@ local function enforce_all()
     end
 end
 
+-- Also wired to on_player_placed_equipment / on_equipment_inserted.
+Exoskeleton.enforce_all = enforce_all
+
 function Exoskeleton.on_init()
     -- No connected players on a fresh save, so this is a no-op there. The
     -- call is harmless and keeps the lifecycle parallel.

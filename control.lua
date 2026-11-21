@@ -40,6 +40,13 @@ script.on_configuration_changed(function()
     Petrificus.on_configuration_changed()
     EuFlag.on_configuration_changed()
     Win.on_configuration_changed()
+    -- Saves keep their old recipe state: re-apply tech effects so the
+    -- Batons / Musket unlock swap lands, and enable the pistol recipe.
+    for _, force in pairs(game.forces) do
+        force.reset_technology_effects()
+        local pistol = force.recipes["pistol"]
+        if pistol then pistol.enabled = true end
+    end
 end)
 
 script.on_event(defines.events.on_player_used_capsule, function(event)
@@ -68,6 +75,24 @@ script.on_event(defines.events.on_player_armor_inventory_changed, function(event
     Exoskeleton.on_player_armor_inventory_changed(event)
 end)
 
+-- Exoskeleton put into the grid of armor that is already worn (by hand or
+-- by personal-roboport bots) does not change the armor inventory.
+script.on_event({
+    defines.events.on_player_placed_equipment,
+    defines.events.on_equipment_inserted,
+}, function(event)
+    Exoskeleton.enforce_all()
+end)
+
+script.on_event({
+    defines.events.on_built_entity,
+    defines.events.on_robot_built_entity,
+    defines.events.script_raised_built,
+    defines.events.script_raised_revive,
+}, function(event)
+    Cravings.on_built(event)
+end)
+
 script.on_event(defines.events.on_player_main_inventory_changed, function(event)
     TowerOfLondon.on_player_main_inventory_changed(event)
 end)
@@ -87,6 +112,10 @@ end)
 
 script.on_event(defines.events.on_rocket_launched, function(event)
     Win.on_rocket_launched(event)
+end)
+
+script.on_event(defines.events.on_cargo_pod_finished_ascending, function(event)
+    Win.on_cargo_pod_finished_ascending(event)
 end)
 
 script.on_event(defines.events.on_player_driving_changed_state, function(event)

@@ -1,8 +1,8 @@
 -- Petrificus Totalus: permanent movement disable for the target.
 --
 -- - Player target -> moved into a permission group that denies movement
---   (start_walking), manual mining (begin_mining), and hand-crafting
---   (craft). Everything else stays allowed — build, ghost placement via
+--   (start_walking, driving), manual mining (entities and tiles), and
+--   hand-crafting (craft). Everything else stays allowed — build, ghost placement via
 --   map, blueprints, chat, GUIs. The character stays in the world but
 --   cannot walk, mine, or hand-craft. The player still plays — from the
 --   radar, with construction bots. Sticky across save / load.
@@ -23,7 +23,10 @@ local PETRIFY_GROUP_NAME = "hmfea-petrified-player"
 local PETRIFIED_DENIED = {
     "start_walking",   -- WASD movement
     "begin_mining",    -- start manual entity mining
+    "begin_mining_terrain", -- hand-mine floor tiles
     "craft",           -- queue a craft in the player's character
+    "toggle_driving",  -- get into / out of a vehicle
+    "change_riding_state", -- drive a vehicle
 }
 
 local function init_storage()
@@ -37,15 +40,11 @@ function Petrificus.on_init()
     init_storage()
 end
 
-function Petrificus.on_configuration_changed()
-    init_storage()
-end
-
 local function get_or_create_petrify_group()
     local group = game.permissions.get_group(PETRIFY_GROUP_NAME)
-    if group then return group end
-    group = game.permissions.create_group(PETRIFY_GROUP_NAME)
+        or game.permissions.create_group(PETRIFY_GROUP_NAME)
     -- New groups default to all-allowed; we only flip the denied actions.
+    -- Applied to existing groups too, so older saves pick up new entries.
     for _, action_name in ipairs(PETRIFIED_DENIED) do
         local id = defines.input_action[action_name]
         if id then
@@ -53,6 +52,14 @@ local function get_or_create_petrify_group()
         end
     end
     return group
+end
+
+function Petrificus.on_configuration_changed()
+    init_storage()
+    -- Older saves: re-apply the denied list so new entries reach the group.
+    if game.permissions.get_group(PETRIFY_GROUP_NAME) then
+        get_or_create_petrify_group()
+    end
 end
 
 local function petrify_unit(entity)
@@ -123,8 +130,8 @@ function Petrificus.on_player_joined_game(event)
     init_storage()
     if storage.petrificus.players[event.player_index] then
         local player = game.get_player(event.player_index)
+        local group = get_or_create_petrify_group()
         if player and player.valid then
-            local group = get_or_create_petrify_group()
             group.add_player(player)
         end
     end

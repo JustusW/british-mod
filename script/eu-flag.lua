@@ -10,6 +10,10 @@ local EuFlag = {}
 local FLAG_TIER_COUNT = 5
 local FLAG_BASE_NAME = "hmfea-eu-flag"
 local MIN_MINING_TICKS = 30 * 60  -- 30 seconds @ 60 ticks/s
+-- Base-speed hand-mining takes exactly MIN_MINING_TICKS and the polled start
+-- tick can be a tick or two late; half a second of slack keeps an un-upgraded
+-- player from escalating. Real upgrades are at least +30 %.
+local MINING_SLACK_TICKS = 30
 
 local BITER_NAMES = {
     ["small-biter"] = true, ["medium-biter"] = true, ["big-biter"] = true, ["behemoth-biter"] = true,
@@ -126,7 +130,7 @@ function EuFlag.on_pre_player_mined_item(event)
     if not stored or stored.unit_number ~= entity.unit_number then return end
 
     local elapsed = game.tick - stored.start_tick
-    if elapsed >= MIN_MINING_TICKS then return end
+    if elapsed >= MIN_MINING_TICKS - MINING_SLACK_TICKS then return end
 
     -- Queue a respawn at the same spot, one tier higher, on the next tick.
     table.insert(storage.eu_flag.respawn_queue, {

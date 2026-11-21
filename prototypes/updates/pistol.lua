@@ -20,3 +20,11 @@ if pistol_item then
     pistol_item.localised_name = { "hmfea.pis-what-now-name" }
     pistol_item.localised_description = { "hmfea.pis-what-now-description" }
 end
+
+-- 2.1 base ships the pistol recipe disabled and hidden with no unlocking
+-- tech; the spec wants it craftable from the first tick.
+local pistol_recipe = data.raw["recipe"] and data.raw["recipe"]["pistol"]
+if pistol_recipe then
+    pistol_recipe.enabled = true
+    pistol_recipe.hidden = false
+end

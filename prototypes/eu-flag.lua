@@ -8,7 +8,7 @@
 local Placeholder = require("prototypes.placeholder")
 
 local TIER_COUNT = 5
-local BASE_MINING_TIME = 30
+local BASE_MINING_TIME = 15  -- seconds at mining speed 1; the character mines at 0.5 -> 30 s by hand
 local TIME_FACTOR = 1.5
 local BASE_SCALE = 0.5
 local SCALE_FACTOR = 1.5

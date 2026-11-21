@@ -47,6 +47,16 @@ data:extend({
 })
 
 data:extend({
+    -- Wood grown in the Greenhouse, so food does not depend on chopping trees.
+    {
+        type = "recipe",
+        name = "hmfea-greenhouse-wood",
+        enabled = true,
+        categories = { "hmfea-greenhouse" },
+        energy_required = 5,
+        ingredients = {},
+        results = { { type = "item", name = "wood", amount = 1 } },
+    },
     -- Wood -> Potato (greenhouse).
     {
         type = "recipe",

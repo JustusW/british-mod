@@ -1,5 +1,5 @@
 -- Win condition. Always one path: launch a Mr. Blobby payload via the
--- rocket silo. on_rocket_launched is the trigger; the per-force auto-granted
+-- rocket silo. on_cargo_pod_finished_ascending is the trigger; the per-force auto-granted
 -- flag (set by script/blobby.lua) decides which victory text plays.
 --
 -- Vanilla rocket-launch victory comes from the freeplay scenario's
@@ -24,19 +24,6 @@ local function inventory_has_blobby(inv)
     return inv ~= nil and inv.get_item_count(PAYLOAD_NAME) > 0
 end
 
--- 2.1: the rocket's payload sits in the cargo pod attached to the rocket
--- (defines.inventory.rocket no longer exists).
-local function payload_carries_blobby(event)
-    local rocket = event.rocket
-    if rocket and rocket.valid then
-        local pod = rocket.attached_cargo_pod
-        if pod and pod.valid and inventory_has_blobby(pod.get_inventory(defines.inventory.cargo_unit)) then
-            return true
-        end
-    end
-    return false
-end
-
 function Win.on_init()
     disable_vanilla_victory()
 end
@@ -45,13 +32,22 @@ function Win.on_configuration_changed()
     disable_vanilla_victory()
 end
 
+-- The silo-script still declares vanilla victory on on_rocket_launched, so
+-- keep switching it off there. The payload check happens on the cargo pod.
 function Win.on_rocket_launched(event)
-    local rocket = event.rocket
-    if not (rocket and rocket.valid) then return end
+    disable_vanilla_victory()
+end
+
+-- 2.1: rocket and cargo pod are separate entities and launch triggers moved
+-- to on_cargo_pod_finished_ascending. The payload sits in the pod.
+function Win.on_cargo_pod_finished_ascending(event)
+    if not event.launched_by_rocket then return end
+    local pod = event.cargo_pod
+    if not (pod and pod.valid) then return end
     disable_vanilla_victory()
 
-    local force = rocket.force
-    local has_blobby = payload_carries_blobby(event)
+    local force = pod.force
+    local has_blobby = inventory_has_blobby(pod.get_inventory(defines.inventory.cargo_unit))
 
     if not has_blobby then
         -- Fallback: if vanilla still declared victory, undo it. Only
@@ -87,10 +83,10 @@ function Win.on_rocket_launched(event)
     end
 
     game.reset_game_state()
+    game.set_win_ending_info({ title = { key }, message = { key } })
     game.set_game_state({
         game_finished = true,
         player_won = true,
-        victorious_force = force,
         can_continue = true,
     })
 end

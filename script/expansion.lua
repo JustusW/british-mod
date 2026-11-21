@@ -50,7 +50,7 @@ function Expansion.on_unit_group_finished_gathering(event)
     local from = cmd.destination
     Log.debug("expansion", string.format(
         "event=retarget group=%d from=%.0f,%.0f to=%.0f,%.0f resource=%s",
-        group.group_number,
+        group.unique_id,
         from and from.x or 0, from and from.y or 0,
         new_destination.x, new_destination.y,
         target.name

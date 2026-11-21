@@ -87,22 +87,22 @@ data:extend({
 -- Recipes for the chain. Smelting recipes use category "smelting"; everything
 -- else uses default "crafting"; the final cuppa-tea uses "hmfea-hand-only".
 data:extend({
-    -- Stone -> Clay (smelting)
+    -- Stone -> Clay. Plain crafting: vanilla stone-brick already smelts stone,
+    -- and a furnace picks one recipe per input item.
     {
         type = "recipe",
         name = "hmfea-clay",
         enabled = true,
-        categories = { "smelting" },
         energy_required = 3.2,
         ingredients = { { type = "item", name = "stone", amount = 1 } },
         results = { { type = "item", name = "hmfea-clay", amount = 1 } },
     },
-    -- Clay + Coal -> Porcelain (smelting)
+    -- Clay + Coal -> Porcelain. Plain crafting: base furnaces take only one
+    -- input item, so a two-ingredient smelting recipe could never run.
     {
         type = "recipe",
         name = "hmfea-porcelain",
         enabled = true,
-        categories = { "smelting" },
         energy_required = 6.4,
         ingredients = {
             { type = "item", name = "hmfea-clay", amount = 1 },
@@ -184,8 +184,8 @@ data:extend({
         },
         results = { { type = "item", name = "hmfea-kettle", amount = 1 } },
     },
-    -- Kettle of Water: kettle filled (use water barrel as ingredient).
-    -- (The full design says "barrel of water"; using vanilla water-barrel.)
+    -- Kettle of Water: kettle filled from a vanilla water-barrel (plain
+    -- crafting, so it can be hand-crafted). The empty barrel comes back.
     {
         type = "recipe",
         name = "hmfea-kettle-of-water",
@@ -193,10 +193,13 @@ data:extend({
         energy_required = 1,
         ingredients = {
             { type = "item", name = "hmfea-kettle", amount = 1 },
-            { type = "fluid", name = "water",       amount = 50 },
+            { type = "item", name = "water-barrel", amount = 1 },
         },
-        results = { { type = "item", name = "hmfea-kettle-of-water", amount = 1 } },
-        categories = { "crafting-with-fluid" },
+        results = {
+            { type = "item", name = "hmfea-kettle-of-water", amount = 1 },
+            { type = "item", name = "barrel",                amount = 1 },
+        },
+        main_product = "hmfea-kettle-of-water",
     },
     -- Kettle of Boiling Water: smelt the kettle of water in a furnace
     {
