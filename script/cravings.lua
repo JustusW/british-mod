@@ -10,6 +10,7 @@
 -- the force; one player eating feeds every Craven player on the force.
 -- Reaching Craven also fires the Bloody Uncivilised achievement.
 local Log = require("script.log")
+local Shards = require("script.shards")
 local Voice = require("script.voice")
 local Cravings = {}
 
@@ -301,7 +302,9 @@ function Cravings.on_player_used_capsule(event)
         player.print({ "hmfea.emergency-tea-insult" })
         Voice.say(player, "emergency-tea-insult")
     end
-    if RETURNS[event.item.name] then
+    if event.item.name == "hmfea-cuppa-tea" then
+        Shards.cup_after_drink(player)  -- the cup comes back, or breaks
+    elseif RETURNS[event.item.name] then
         give_back(player, RETURNS[event.item.name])
     end
     -- One eater is enough: every Craven player on the force (online or not)

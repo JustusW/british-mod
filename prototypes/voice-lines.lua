@@ -16,4 +16,5 @@ return {
     "blobby-victory",
     "blobby-consolation",
     "win-suppressed",
+    "teacup-broken",
 }
