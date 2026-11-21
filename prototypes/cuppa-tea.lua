@@ -34,6 +34,15 @@ data:extend({
     basic_item("hmfea-raw-tea",               "raw-resource",         "a-a-d[hmfea-raw-tea]"),
     basic_item("hmfea-tea-leaves",            "intermediate-product", "a-a-e[hmfea-tea-leaves]"),
     basic_item("hmfea-teacup-clay",           "intermediate-product", "a-a-f[hmfea-teacup-clay]"),
+    -- Unfired Teacup: icon by ingo once delivered; until then the teacup, pale.
+    {
+        type = "item",
+        name = "hmfea-teacup-unfired",
+        icons = { { icon = "__hmfea__/graphics/icons/teacup-clay.png", icon_size = 64, tint = { 1, 0.9, 0.75, 0.6 } } },
+        subgroup = "intermediate-product",
+        order = "a-a-e[hmfea-teacup-unfired]",
+        stack_size = 50,
+    },
     basic_item("hmfea-pot-porcelain",         "intermediate-product", "a-a-g[hmfea-pot-porcelain]"),
     basic_item("hmfea-pot-of-tea",            "intermediate-product", "a-a-h[hmfea-pot-of-tea]"),
     basic_item("hmfea-kettle",                "intermediate-product", "a-a-i[hmfea-kettle]"),
@@ -111,17 +120,15 @@ data:extend({
         ingredients = { { type = "item", name = "stone", amount = 1 } },
         results = { { type = "item", name = "hmfea-clay", amount = 1 } },
     },
-    -- Clay + Coal -> Porcelain. Plain crafting: base furnaces take only one
-    -- input item, so a two-ingredient smelting recipe could never run.
+    -- Clay -> Porcelain, fired in a furnace (the coal is the furnace's fuel).
+    -- The only smelting recipe taking clay, so the furnace picks it.
     {
         type = "recipe",
         name = "hmfea-porcelain",
+        categories = { "smelting" },
         enabled = true,
         energy_required = 6.4,
-        ingredients = {
-            { type = "item", name = "hmfea-clay", amount = 1 },
-            { type = "item", name = "coal",       amount = 1 },
-        },
+        ingredients = { { type = "item", name = "hmfea-clay", amount = 1 } },
         results = { { type = "item", name = "hmfea-porcelain", amount = 1 } },
     },
     -- Wood -> Paper. Made in the Greenhouse (hmfea-greenhouse category).
@@ -156,13 +163,22 @@ data:extend({
         },
         results = { { type = "item", name = "hmfea-tea-leaves", amount = 1 } },
     },
-    -- Teacup made from Clay
+    -- Teacup: shaped from 2 clay (Unfired Teacup), then fired in a furnace.
     {
         type = "recipe",
-        name = "hmfea-teacup-clay",
+        name = "hmfea-teacup-unfired",
         enabled = true,
         energy_required = 1,
         ingredients = { { type = "item", name = "hmfea-clay", amount = 2 } },
+        results = { { type = "item", name = "hmfea-teacup-unfired", amount = 1 } },
+    },
+    {
+        type = "recipe",
+        name = "hmfea-teacup-clay",
+        categories = { "smelting" },
+        enabled = true,
+        energy_required = 3.2,
+        ingredients = { { type = "item", name = "hmfea-teacup-unfired", amount = 1 } },
         results = { { type = "item", name = "hmfea-teacup-clay", amount = 1 } },
     },
     -- Pot (Porcelain) made from Porcelain
