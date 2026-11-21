@@ -42,13 +42,13 @@ data:extend({
 })
 
 -- Teacup Shards: what a broken cup leaves in the player's inventory for good
--- (script/shards.lua). Stack size 1, so each takes a slot. Icon: ingo's
--- teacup-shards.png once delivered; until then the teacup, greyed.
+-- (script/shards.lua). Stack size 1, so each takes a slot. Icon by ingo.
 data:extend({
     {
         type = "item",
         name = "hmfea-teacup-shards",
-        icons = { { icon = "__hmfea__/graphics/icons/teacup-clay.png", icon_size = 64, tint = { 0.45, 0.45, 0.45, 1 } } },
+        icon = "__hmfea__/graphics/icons/teacup-shards.png",
+        icon_size = 64,
         subgroup = "intermediate-product",
         order = "a-a-x[hmfea-teacup-shards]",
         stack_size = 1,
