@@ -8,10 +8,11 @@
 --     Detonates a radius-25 nuke-style explosion centred on the caster
 --     regardless of cursor aim.
 --   - hmfea-spell-avada-kedavra: thrown capsule with a single targeted electric
---     strike. Tesla-turret-bolt visuals are tracked in design.md "Immediate
---     rework" — current implementation is generic electric area damage as a
---     placeholder.
+--     strike. A script trigger ("hmfea-avada-kedavra") makes script/avada.lua
+--     draw a Tesla turret bolt (hmfea-avada-kedavra-beam, Space Age art copied
+--     into graphics/entity/tesla-beam/) from the caster to the target.
 local Placeholder = require("prototypes.placeholder")
+local util = require("util")
 
 -- Wand is a flavor item gating the spell branch via tech prerequisites.
 data:extend({
@@ -126,9 +127,10 @@ local kadabra_effects = {
     },
 }
 
--- Avada Kedavra: single high-damage electric strike at the target tile.
+-- Avada Kedavra: single high-damage electric strike at the target tile. The
+-- script trigger draws the Tesla bolt from the caster to the target.
 local kedavra_effects = {
-    { type = "create-entity", entity_name = "explosion" },
+    { type = "script", effect_id = "hmfea-avada-kedavra" },
     {
         type = "nested-result",
         action = {
@@ -143,6 +145,53 @@ local kedavra_effects = {
         },
     },
 }
+
+-- Tesla turret bolt for Avada Kedavra: the Space Age tesla beam graphics,
+-- copied into this mod (allowed because info.json's spoiling_required means
+-- the player owns Space Age; the space-age mod itself stays disabled, so
+-- __space-age__ paths would not resolve). Visual only: the damage comes from
+-- the capsule's own area effect.
+local BEAM_DIR = "__hmfea__/graphics/entity/tesla-beam/"
+
+local function beam_part(file, opts)
+    opts.draw_as_glow = true
+    opts.animation_speed = 0.5
+    opts.scale = 0.5
+    opts.blend_mode = opts.blend_mode or "additive"
+    return util.sprite_load(BEAM_DIR .. file, opts)
+end
+
+local beam_body = {}
+for i = 1, 6 do
+    table.insert(beam_body, { layers = {
+        beam_part("tesla-body-" .. i, { frame_count = 20, repeat_count = 4 }),
+        beam_part("lightning-loop-" .. i, { frame_count = 80 }),
+    } })
+end
+
+data:extend({
+    {
+        type = "beam",
+        name = "hmfea-avada-kedavra-beam",
+        flags = { "not-on-map" },
+        hidden = true,
+        width = 0.5,
+        damage_interval = 20,
+        random_target_offset = false,
+        action_triggered_automatically = false,
+        graphics_set = {
+            desired_segment_length = 1,
+            randomize_animation_per_segment = true,
+            beam = {
+                start = beam_part("tesla-beam-START", { frame_count = 20, blend_mode = "normal", flags = { "trilinear-filtering" } }),
+                ending = beam_part("tesla-beam-END", { frame_count = 20, blend_mode = "normal", flags = { "trilinear-filtering" } }),
+                head = beam_part("tesla-head", { frame_count = 20, flags = { "trilinear-filtering" } }),
+                tail = beam_part("tesla-tail", { frame_count = 20, flags = { "trilinear-filtering" } }),
+                body = beam_body,
+            },
+        },
+    },
+})
 
 data:extend({
     spell_capsule(     "hmfea-spell-petrificus-totalus", petrificus_effects, 25, 90),
