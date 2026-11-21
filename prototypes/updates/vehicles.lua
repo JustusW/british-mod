@@ -57,8 +57,8 @@ reskin_entity("car", "car", "hmfea.mini-cooper-name", "hmfea.mini-cooper-descrip
 -- Tank -> Challenger / Churchill. Art by ingo: Challenger 2 hull (64 dir x
 -- 2 frames) and turret (64 dir), scale 0.5, rotation centre = turret ring.
 -- Model credit in credits.md. Vanilla lights stay; no shadow sheet yet.
-reskin_item("tank",   "hmfea.tank-name", "hmfea.tank-description")
-reskin_entity("car",  "tank", "hmfea.tank-name", "hmfea.tank-description")
+reskin_item("tank",   "hmfea.tank-name", "hmfea.tank-description", "__hmfea__/graphics/icons/challenger.png")
+reskin_entity("car",  "tank", "hmfea.tank-name", "hmfea.tank-description", "__hmfea__/graphics/icons/challenger.png")
 local tank = data.raw.car and data.raw.car["tank"]
 if tank then
     local util = require("util")
