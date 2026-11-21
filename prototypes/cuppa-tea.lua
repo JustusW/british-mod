@@ -229,9 +229,32 @@ data:extend({
 })
 
 -- Emergency Teatime: the guaranteed way out of Craven. Hand-craft only, 60 s,
--- 10 wood -> 1 Cuppa Tea. script/teatime.lua plays an annoying sound for the
--- whole craft.
+-- 10 wood -> 1 Emergency Tea (paper cup: ends cravings like Cuppa Tea, spoils
+-- like it, but gives no teacup back). script/teatime.lua plays an annoying
+-- sound for the whole craft.
 data:extend({
+    {
+        type = "capsule",
+        name = "hmfea-emergency-tea",
+        icon = Placeholder.icon_path(),
+        icon_size = 64,
+        subgroup = "intermediate-product",
+        order = "a-a-z[hmfea-emergency-tea]",
+        stack_size = 50,
+        spoil_ticks = 60 * 60 * 5,  -- same as Cuppa Tea
+        spoil_result = "hmfea-spoiled-tea",
+        capsule_action = {
+            type = "use-on-self",
+            attack_parameters = {
+                type = "projectile",
+                activation_type = "consume",
+                ammo_category = "capsule",
+                range = 1,
+                cooldown = 30,
+                ammo_type = {},
+            },
+        },
+    },
     {
         type = "recipe",
         name = "hmfea-emergency-teatime",
@@ -239,7 +262,7 @@ data:extend({
         categories = { "hmfea-hand-only" },
         energy_required = 60,
         ingredients = { { type = "item", name = "wood", amount = 10 } },
-        results = { { type = "item", name = "hmfea-cuppa-tea", amount = 1 } },
+        results = { { type = "item", name = "hmfea-emergency-tea", amount = 1 } },
         order = "a-a-z[hmfea-emergency-teatime]",
     },
 })

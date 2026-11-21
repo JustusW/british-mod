@@ -41,8 +41,20 @@ local EXEMPT = {
 
 local FOOD_ITEMS = {
     ["hmfea-cuppa-tea"] = true,
+    ["hmfea-emergency-tea"] = true,
     ["hmfea-fish-and-chips"] = true,
 }
+
+-- A drunk Cuppa Tea gives its Teacup (Clay) back; Emergency Tea is a paper cup.
+local RETURNS = {
+    ["hmfea-cuppa-tea"] = "hmfea-teacup-clay",
+}
+
+local function give_back(player, item_name)
+    if not (player and player.valid) then return end
+    if player.insert({ name = item_name, count = 1 }) > 0 then return end
+    player.surface.spill_item_stack({ position = player.position, stack = { name = item_name, count = 1 } })
+end
 
 -- Always-visible stage indicator (label at the top of the screen).
 local HUD_NAME = "hmfea-craving-hud"
@@ -258,6 +270,9 @@ end
 function Cravings.on_player_used_capsule(event)
     if not (event.item and FOOD_ITEMS[event.item.name]) then return end
     local player = game.get_player(event.player_index)
+    if RETURNS[event.item.name] then
+        give_back(player, RETURNS[event.item.name])
+    end
     -- One eater is enough: every Craven player on the force (online or not)
     -- is fed too, so the force's factory comes back.
     if player and player.valid then
