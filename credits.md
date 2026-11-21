@@ -40,6 +40,12 @@ the **public domain**.
 2026), originally posted on Twitter/X and released by its author without restrictions; source video:
 https://www.youtube.com/watch?v=coo1dzoN8SE. Trimmed to one verse, mono, loudness-normalised.
 
+## Truthbomb line
+
+`sound/truthbomb.ogg` is Michael Caine's line "You're only supposed to blow the bloody doors off!" from
+_The Italian Job_ (1969), a 3-second quotation used under fair use (parody). Source clip:
+https://www.youtube.com/watch?v=7_PX1cVuaVA (Movieclips), 20-25 s, silence trimmed.
+
 ## Icons
 
 The item, technology and achievement icons are renders by ingo of free 3D models, all **modified** (recoloured,
