@@ -17,6 +17,7 @@ local Avada = require("script.avada")
 local Spidertron = require("script.spidertron")
 local Teatime = require("script.teatime")
 local Shards = require("script.shards")
+local ResearchLines = require("script.research-lines")
 
 script.on_init(function()
     Migration.on_init()
@@ -125,6 +126,7 @@ end)
 
 script.on_event(defines.events.on_research_finished, function(event)
     Blobby.on_research_finished(event)
+    ResearchLines.on_research_finished(event)
 end)
 
 script.on_event(defines.events.on_rocket_launched, function(event)
