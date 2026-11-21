@@ -14,6 +14,7 @@ local EuFlag = require("script.eu-flag")
 local Expansion = require("script.expansion")
 local Petrificus = require("script.petrificus")
 local Avada = require("script.avada")
+local Spidertron = require("script.spidertron")
 
 script.on_init(function()
     Migration.on_init()
@@ -27,6 +28,7 @@ script.on_init(function()
     Petrificus.on_init()
     EuFlag.on_init()
     Win.on_init()
+    Spidertron.on_init()
 end)
 
 script.on_configuration_changed(function()
@@ -41,6 +43,7 @@ script.on_configuration_changed(function()
     Petrificus.on_configuration_changed()
     EuFlag.on_configuration_changed()
     Win.on_configuration_changed()
+    Spidertron.on_configuration_changed()
     -- Saves keep their old recipe state: re-apply tech effects so the
     -- Batons / Musket unlock swap lands, and enable the pistol recipe.
     for _, force in pairs(game.forces) do
@@ -63,6 +66,7 @@ script.on_event(defines.events.on_tick, function(event)
     Tank.on_tick(event)
     EuFlag.on_tick(event)
     Petrificus.on_tick(event)
+    Spidertron.on_tick(event)
 end)
 
 script.on_event(defines.events.on_player_joined_game, function(event)
@@ -92,6 +96,7 @@ script.on_event({
     defines.events.script_raised_revive,
 }, function(event)
     Cravings.on_built(event)
+    Spidertron.on_built(event)
 end)
 
 script.on_event(defines.events.on_player_main_inventory_changed, function(event)
