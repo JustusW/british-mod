@@ -34,6 +34,12 @@ All spoken lines are text-to-speech renders by ingo in a voice cloned from a Lib
 "LibriVox Dialect and Accent Collection Vol. 1" (https://archive.org/details/dialect_accent_0909_librivox), which is in
 the **public domain**.
 
+## Tank anthem
+
+`sound/god-save-the-king.ogg` is a cut of England fans singing "God Save the King" at MetLife Stadium (FIFA World Cup
+2026), originally posted on Twitter/X and released by its author without restrictions; source video:
+https://www.youtube.com/watch?v=coo1dzoN8SE. Trimmed to one verse, mono, loudness-normalised.
+
 ## Icons
 
 The item, technology and achievement icons are renders by ingo of free 3D models, all **modified** (recoloured,
