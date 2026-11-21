@@ -31,6 +31,26 @@ local function show_indicator(player, entry, tick)
     end
 end
 
+-- The cage in the world: back bars under the character, front bars over it,
+-- both following the character until release.
+local function lock_in_cage(player, entry)
+    local character = player.character
+    if not (character and character.valid) then return end
+    entry.cage = {
+        rendering.draw_sprite({ sprite = "hmfea-tower-cage-back", target = character,
+            surface = character.surface, render_layer = "lower-object" }),
+        rendering.draw_sprite({ sprite = "hmfea-tower-cage-front", target = character,
+            surface = character.surface, render_layer = "higher-object-under" }),
+    }
+end
+
+local function remove_cage(entry)
+    for _, obj in pairs(entry.cage or {}) do
+        if obj and obj.valid then obj.destroy() end
+    end
+    entry.cage = nil
+end
+
 local function clear_indicator(player)
     if not (player and player.valid) then return end
     local label = player.gui.top[HUD_NAME]
@@ -85,6 +105,7 @@ local function sentence(player, current_tick)
     local jail = get_or_create_jail_group()
     jail.add_player(player)
     show_indicator(player, sentenced[player.index], current_tick)
+    lock_in_cage(player, sentenced[player.index])
 
     player.print({ "hmfea.tower-of-london-sentenced" })
     Voice.say(player, "tower-of-london-sentenced")
@@ -98,6 +119,7 @@ local function release(player_index)
     init_storage()
     local entry = storage.tower_of_london.sentenced[player_index]
     if not entry then return end
+    remove_cage(entry)
     local player = game.get_player(player_index)
     if player and player.valid then
         -- A player petrified during the sentence stays petrified.
