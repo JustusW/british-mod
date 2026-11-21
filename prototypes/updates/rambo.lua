@@ -27,15 +27,23 @@ local TIERS = {
 -- Purely visual: movement_speed is untouched.
 local DISTANCE_PER_FRAME = { toddler = 0.123, child = 0.197, teen = 0.268, adult = 0.333 }
 
+-- Colour sheet plus ingo's matching shadow sheet (<path>-shadow, same layout).
 local function rotated(path, frame_count, extra)
-    local opts = {
-        frame_count = frame_count,
-        direction_count = 16,
-        scale = 0.5,
-        allow_forced_downscale = true,
-    }
-    for k, v in pairs(extra or {}) do opts[k] = v end
-    return { layers = { util.sprite_load(path, opts) } }
+    local function opts(shadow)
+        local o = {
+            frame_count = frame_count,
+            direction_count = 16,
+            scale = 0.5,
+            allow_forced_downscale = true,
+            draw_as_shadow = shadow or nil,
+        }
+        for k, v in pairs(extra or {}) do o[k] = v end
+        return o
+    end
+    return { layers = {
+        util.sprite_load(path, opts(false)),
+        util.sprite_load(path .. "-shadow", opts(true)),
+    } }
 end
 
 -- Thrower attack, frames 1-14: 1-6 into the stance, 7 ready, 8-14 the throw,
@@ -131,22 +139,25 @@ end
 -- Nests: biter-spawner -> EU Building, spitter-spawner -> Barrack Tent.
 -- ingo ships one file per variation (v1..v4); idle 7 frames (loop), death 18
 -- frames (last frame = ruin).
+local function nest_layers(name, kind, variation, opts)
+    local base = DIR .. name .. "/" .. name .. "-" .. kind
+    local function with(shadow)
+        local o = { scale = 0.5, allow_forced_downscale = true, draw_as_shadow = shadow or nil }
+        for k, v in pairs(opts) do o[k] = v end
+        return o
+    end
+    return { layers = {
+        util.sprite_load(base .. "-v" .. variation, with(false)),
+        util.sprite_load(base .. "-shadow-v" .. variation, with(true)),
+    } }
+end
+
 local function nest_idle(name, variation)
-    return { layers = { util.sprite_load(DIR .. name .. "/" .. name .. "-idle-v" .. variation, {
-        frame_count = 7,
-        scale = 0.5,
-        animation_speed = 0.18,
-        allow_forced_downscale = true,
-    }) } }
+    return nest_layers(name, "idle", variation, { frame_count = 7, animation_speed = 0.18 })
 end
 
 local function nest_death(name, variation)
-    return { layers = { util.sprite_load(DIR .. name .. "/" .. name .. "-death-v" .. variation, {
-        frame_count = 18,
-        direction_count = 1,
-        scale = 0.5,
-        allow_forced_downscale = true,
-    }) } }
+    return nest_layers(name, "death", variation, { frame_count = 18, direction_count = 1 })
 end
 
 local NESTS = {

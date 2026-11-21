@@ -7,15 +7,23 @@ local util = require("util")
 
 local DIR = "__hmfea__/graphics/entity/gentleman/"
 
+-- Colour sheet plus ingo's matching shadow sheet (<name>-shadow).
 local function anim(name, directions, frames, speed)
-    return { layers = { util.sprite_load(DIR .. name, {
-        frame_count = frames,
-        direction_count = directions,
-        animation_speed = speed,
-        scale = 0.5,
-        allow_forced_downscale = true,
-        usage = "player",
-    }) } }
+    local function opts(shadow)
+        return {
+            frame_count = frames,
+            direction_count = directions,
+            animation_speed = speed,
+            scale = 0.5,
+            allow_forced_downscale = true,
+            usage = "player",
+            draw_as_shadow = shadow or nil,
+        }
+    end
+    return { layers = {
+        util.sprite_load(DIR .. name, opts(false)),
+        util.sprite_load(DIR .. name .. "-shadow", opts(true)),
+    } }
 end
 
 local character = data.raw.character and data.raw.character["character"]
@@ -40,10 +48,9 @@ end
 local corpse = data.raw["character-corpse"] and data.raw["character-corpse"]["character-corpse"]
 if corpse then
     -- Two lying poses (hat, monocle and cane knocked off), one direction.
-    corpse.pictures = { { layers = { util.sprite_load(DIR .. "gentleman-dead", {
-        frame_count = 2,
-        scale = 0.5,
-        usage = "player",
-    }) } } }
+    corpse.pictures = { { layers = {
+        util.sprite_load(DIR .. "gentleman-dead", { frame_count = 2, scale = 0.5, usage = "player" }),
+        util.sprite_load(DIR .. "gentleman-dead-shadow", { frame_count = 2, scale = 0.5, usage = "player", draw_as_shadow = true }),
+    } } }
     corpse.armor_picture_mapping = {}
 end
