@@ -9,4 +9,6 @@ require("prototypes.updates.musket")
 require("prototypes.updates.rocket-silo-prereqs")
 require("prototypes.updates.vehicles")
 require("prototypes.updates.biters")
+require("prototypes.updates.rambo")  -- after biters: real art replaces the placeholder icons
+require("prototypes.updates.gentleman")
 require("prototypes.updates.tank-prereq")
