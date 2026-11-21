@@ -1,7 +1,6 @@
 -- Truthbomb (NHS Double Decker Bus): research-gated capsule that produces a
 -- massive area explosion. Final pre-Rocket-Silo research. Audio (the Michael
 -- Caine line) is TBD — placeholder fires a [truthbomb] script trigger.
-local Placeholder = require("prototypes.placeholder")
 
 -- Projectile entity for the bomb in flight.
 data:extend({
@@ -10,7 +9,16 @@ data:extend({
         name = "hmfea-truthbomb-projectile",
         flags = { "not-on-map" },
         acceleration = 0,
-        animation = Placeholder.animation(64),
+        -- Art by ingo: the Vote Leave "NHS bus", nose up so the engine's
+        -- rotation along the flight lines it up. Model credit: CREDITS.md.
+        animation = {
+            filename = "__hmfea__/graphics/entity/truthbomb/truthbomb-projectile.png",
+            width = 128,
+            height = 128,
+            frame_count = 1,
+            scale = 0.5,
+            priority = "high",
+        },
         action = {
             type = "direct",
             action_delivery = {
@@ -51,7 +59,7 @@ data:extend({
     {
         type = "capsule",
         name = "hmfea-truthbomb",
-        icon = Placeholder.icon_path(),
+        icon = "__hmfea__/graphics/icons/truthbomb.png",
         icon_size = 64,
         subgroup = "capsule",
         order = "d[capsule]-z[hmfea-truthbomb]",

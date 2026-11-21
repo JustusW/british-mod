@@ -44,6 +44,30 @@ local FOOD_ITEMS = {
     ["hmfea-fish-and-chips"] = true,
 }
 
+-- Always-visible stage indicator (label at the top of the screen).
+local HUD_NAME = "hmfea-craving-hud"
+local HUD_COLORS = {
+    [STAGE_SATIATED] = { r = 0.35, g = 0.85, b = 0.35 },
+    [STAGE_CRAVING] = { r = 1.0, g = 0.6, b = 0.1 },
+    [STAGE_CRAVEN] = { r = 1.0, g = 0.2, b = 0.2 },
+}
+
+local function update_hud(player, entry, tick)
+    if not (player and player.valid and player.connected and entry and entry.stage) then return end
+    local label = player.gui.top[HUD_NAME]
+    if not (label and label.valid) then
+        label = player.gui.top.add({ type = "label", name = HUD_NAME })
+        label.style.font = "default-large-bold"
+    end
+    if entry.stage == STAGE_CRAVING and entry.stage_ends_at then
+        local seconds = math.max(0, math.ceil((entry.stage_ends_at - tick) / 60))
+        label.caption = { "hmfea.craving-hud-craving", seconds }
+    else
+        label.caption = { "hmfea.craving-hud-" .. entry.stage }
+    end
+    label.style.font_color = HUD_COLORS[entry.stage]
+end
+
 local function init_storage()
     storage = storage or {}
     storage.cravings = storage.cravings or {}
@@ -129,6 +153,8 @@ local function set_stage(player_index, stage, current_tick)
         entry.stage_ends_at = nil
     end
 
+    update_hud(game.get_player(player_index), entry, current_tick)
+
     if prev_stage and prev_stage ~= stage then
         Log.debug("craving", string.format(
             "event=stage_change player=%d from=%s to=%s",
@@ -194,6 +220,7 @@ function Cravings.on_tick(event)
                 player.print({ "hmfea.craven-start" })
             end
         end
+        update_hud(player, storage.cravings.players[player.index], event.tick)
     end
 end
 
