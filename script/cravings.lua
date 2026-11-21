@@ -139,9 +139,11 @@ local function force_has_craven_player(force)
     return false
 end
 
+-- Pauses every running machine of the force and adds it to the shutdown list.
+-- Additive, so a repeat sweep (mod update, missed build) catches stragglers.
 local function shutdown_force(force)
-    if storage.cravings.force_shutdowns[force.index] then return end
-    local affected = {}
+    local affected = storage.cravings.force_shutdowns[force.index] or {}
+    local before = #affected
     for _, surface in pairs(game.surfaces) do
         for _, entity in pairs(surface.find_entities_filtered({
             force = force,
@@ -157,8 +159,8 @@ local function shutdown_force(force)
     end
     storage.cravings.force_shutdowns[force.index] = affected
     Log.debug("craving", string.format(
-        "event=force_shutdown force=%d entities=%d",
-        force.index, #affected
+        "event=force_shutdown force=%d entities=%d new=%d",
+        force.index, #affected, #affected - before
     ))
 end
 
@@ -236,6 +238,10 @@ end
 
 function Cravings.on_configuration_changed()
     init_storage()
+    -- A Craven running across a mod update: pause what the old version left on.
+    for _, force in pairs(game.forces) do
+        if force_has_craven_player(force) then shutdown_force(force) end
+    end
 end
 
 function Cravings.on_player_joined_game(event)
