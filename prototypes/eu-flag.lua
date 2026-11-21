@@ -7,10 +7,10 @@
 -- same spot.
 local TIER_COUNT = 5
 -- Art by ingo: 128x128 still (graphics/entity/eu-flag/eu-flag.png). Drawn at
--- half the tier scale so its on-screen size equals the selection box
--- (tier 1 = 1 tile, x1.5 per tier).
+-- the tier scale: tier 1 = 2 tiles, x1.5 per tier (Justus: 1 tile was too
+-- small). Selection and collision boxes keep their own size.
 local PICTURE_SIZE = 128
-local PICTURE_SCALE_FACTOR = 0.5
+local PICTURE_SCALE_FACTOR = 1.0
 local BASE_MINING_TIME = 15  -- seconds at mining speed 1; the character mines at 0.5 -> 30 s by hand
 local TIME_FACTOR = 1.5
 local BASE_SCALE = 0.5
