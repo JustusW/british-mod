@@ -34,11 +34,12 @@ data:extend({
     basic_item("hmfea-raw-tea",               "raw-resource",         "a-a-d[hmfea-raw-tea]"),
     basic_item("hmfea-tea-leaves",            "intermediate-product", "a-a-e[hmfea-tea-leaves]"),
     basic_item("hmfea-teacup-clay",           "intermediate-product", "a-a-f[hmfea-teacup-clay]"),
-    -- Unfired Teacup: icon by ingo once delivered; until then the teacup, pale.
+    -- Unfired Teacup (icon by ingo).
     {
         type = "item",
         name = "hmfea-teacup-unfired",
-        icons = { { icon = "__hmfea__/graphics/icons/teacup-clay.png", icon_size = 64, tint = { 1, 0.9, 0.75, 0.6 } } },
+        icon = "__hmfea__/graphics/icons/teacup-unfired.png",
+        icon_size = 64,
         subgroup = "intermediate-product",
         order = "a-a-e[hmfea-teacup-unfired]",
         stack_size = 50,
