@@ -28,6 +28,10 @@ Third-party assets used in _His Majesty's Factory Expansion Act_. This file ship
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), source:
   https://sketchfab.com/3d-models/4d2b89e06e124c81b40a6541f6dab94b — **modified**: rendered by ingo as the Woodchipper.
 
+- **"Cartoon Leprechaun"** by thejohnsimone, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/),
+  source: https://sketchfab.com/3d-models/36eed62484c14e2aa4d8ee068dc51291 — **modified**: animated and rendered by ingo as
+  the worms (`graphics/entity/leprechaun/`). Idea for leprechaun worms by Mission.
+
 ## Voices
 
 All spoken lines are text-to-speech renders by ingo in a voice cloned from a LibriVox reader of the
