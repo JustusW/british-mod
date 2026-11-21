@@ -61,8 +61,10 @@ local function shutdown_force(force)
             force = force,
             type = SHUTDOWN_TYPES,
         })) do
-            if entity.active then
-                entity.active = false
+            -- 2.1: LuaEntity.active is read-only; scripts pause machines via
+            -- disabled_by_script. Leave ones another script already paused.
+            if not entity.disabled_by_script then
+                entity.disabled_by_script = true
                 table.insert(affected, entity)
             end
         end
@@ -80,7 +82,7 @@ local function restore_force(force)
     local restored = 0
     for _, entity in pairs(affected) do
         if entity.valid then
-            entity.active = true
+            entity.disabled_by_script = false
             restored = restored + 1
         end
     end

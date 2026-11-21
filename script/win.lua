@@ -2,10 +2,10 @@
 -- rocket silo. on_rocket_launched is the trigger; the per-force auto-granted
 -- flag (set by script/blobby.lua) decides which victory text plays.
 --
--- Vanilla rocket-launch victory is suppressed unless our condition is met:
--- on every on_rocket_launched, we call game.set_game_state with the right
--- finished/won state. If a non-Mr-Blobby rocket is launched while the game
--- is already marked finished by vanilla, we undo it.
+-- Vanilla rocket-launch victory comes from the freeplay scenario's
+-- silo-script (core/lualib/silo-script.lua). We switch it off through its
+-- official remote interface (silo_script.set_no_victory) and, as a fallback
+-- for event-order races, undo any finished state after a non-Blobby launch.
 --
 -- Audio is unchanged — see design.md "Audio". The victory jingle replacement
 -- (if any) ships separately via the utility-sounds override.
@@ -14,28 +14,49 @@ local Win = {}
 
 local PAYLOAD_NAME = "hmfea-mr-blobby"
 
-local function payload_carries_blobby(rocket)
-    if not (rocket and rocket.valid) then return false end
-    local inv = rocket.get_inventory(defines.inventory.rocket)
-    if not inv then return false end
-    return inv.get_item_count(PAYLOAD_NAME) > 0
+local function disable_vanilla_victory()
+    if remote.interfaces["silo_script"] and remote.interfaces["silo_script"]["set_no_victory"] then
+        remote.call("silo_script", "set_no_victory", true)
+    end
+end
+
+local function inventory_has_blobby(inv)
+    return inv ~= nil and inv.get_item_count(PAYLOAD_NAME) > 0
+end
+
+-- 2.1: the rocket's payload sits in the cargo pod attached to the rocket
+-- (defines.inventory.rocket no longer exists).
+local function payload_carries_blobby(event)
+    local rocket = event.rocket
+    if rocket and rocket.valid then
+        local pod = rocket.attached_cargo_pod
+        if pod and pod.valid and inventory_has_blobby(pod.get_inventory(defines.inventory.cargo_unit)) then
+            return true
+        end
+    end
+    return false
+end
+
+function Win.on_init()
+    disable_vanilla_victory()
+end
+
+function Win.on_configuration_changed()
+    disable_vanilla_victory()
 end
 
 function Win.on_rocket_launched(event)
     local rocket = event.rocket
     if not (rocket and rocket.valid) then return end
+    disable_vanilla_victory()
 
     local force = rocket.force
-    local has_blobby = payload_carries_blobby(rocket)
+    local has_blobby = payload_carries_blobby(event)
 
     if not has_blobby then
-        -- Suppress the vanilla "you won" state if it was set: only Mr. Blobby
-        -- launches count as victory.
-        game.set_game_state({
-            game_finished = false,
-            player_won = false,
-            can_continue = true,
-        })
+        -- Fallback: if vanilla still declared victory, undo it. Only
+        -- Mr. Blobby launches count as victory.
+        game.reset_game_state()
         Log.debug("mr-blobby", string.format(
             "event=win_suppressed force=%d reason=no-blobby",
             force.index
@@ -65,7 +86,7 @@ function Win.on_rocket_launched(event)
         end
     end
 
-    -- Trigger / confirm victory.
+    game.reset_game_state()
     game.set_game_state({
         game_finished = true,
         player_won = true,

@@ -59,7 +59,9 @@ local function petrify_unit(entity)
     if not (entity and entity.valid) then return end
     init_storage()
     storage.petrificus.units[entity.unit_number] = true
-    entity.set_command({
+    local commandable = entity.commandable
+    if not commandable then return end
+    commandable.set_command({
         type = defines.command.stop,
         ticks_to_wait = 4294967295,
         distraction = defines.distraction.none,

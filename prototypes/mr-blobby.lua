@@ -13,5 +13,10 @@ data:extend({
         subgroup = "intermediate-product",
         order = "z[hmfea-mr-blobby]",
         stack_size = 1,
+        weight = 1000000,  -- 1 t, one Blobby fills the rocket (like the satellite)
+        -- Without this the item cannot be put into a rocket at all and the
+        -- win condition is unreachable. "manual" = player inserts it in the
+        -- silo's rocket slot.
+        send_to_orbit_mode = "manual",
     },
 })
