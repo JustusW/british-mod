@@ -31,6 +31,9 @@ for tier = 1, TIER_COUNT do
         flags = { "placeable-neutral", "not-rotatable", "not-on-map", "not-deconstructable" },
         max_health = 100,
         collision_box = { { -0.3 * scale * 2, -0.3 * scale * 2 }, { 0.3 * scale * 2, 0.3 * scale * 2 } },
+        -- Collides with nothing: a fight's worth of dropped flags must not
+        -- wall the player in. Still selectable and hand-minable.
+        collision_mask = { layers = {} },
         selection_box = { { -0.5 * scale * 2, -0.5 * scale * 2 }, { 0.5 * scale * 2, 0.5 * scale * 2 } },
         minable = {
             mining_time = mining_time,
