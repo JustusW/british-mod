@@ -16,6 +16,8 @@ local Cravings = {}
 local STAGE_SATIATED = "satiated"
 local STAGE_CRAVING = "craving"
 local STAGE_CRAVEN = "craven"
+local STAGE_DECREPIT = "decrepit"   -- after Emergency Tea: like Satiated, but half speed
+local DECREPIT_SPEED_MODIFIER = -0.5
 
 local CRAVING_TICKS = 60 * 60               -- 1 minute @ 60 ticks/s
 local SATIATED_BASE_TICKS = 60 * 60 * 5     -- 5 minutes minimum
@@ -61,6 +63,7 @@ end
 local HUD_NAME = "hmfea-craving-hud"
 local HUD_COLORS = {
     [STAGE_SATIATED] = { r = 0.35, g = 0.85, b = 0.35 },
+    [STAGE_DECREPIT] = { r = 0.65, g = 0.65, b = 0.65 },
     [STAGE_CRAVING] = { r = 1.0, g = 0.6, b = 0.1 },
     [STAGE_CRAVEN] = { r = 1.0, g = 0.2, b = 0.2 },
 }
@@ -68,6 +71,7 @@ local HUD_COLORS = {
 -- Game alerts in the alert bar while Craving / Craven. Refreshed with the
 -- indicator once per second; removed again on Satiated.
 local ALERTS = {
+    [STAGE_DECREPIT] = { icon = { type = "item", name = "hmfea-emergency-tea" }, message = { "hmfea.alert-decrepit" } },
     [STAGE_CRAVING] = { icon = { type = "item", name = "raw-fish" }, message = { "hmfea.alert-craving" } },
     [STAGE_CRAVEN] = { icon = { type = "virtual", name = "signal-skull" }, message = { "hmfea.alert-craven" } },
 }
@@ -82,9 +86,25 @@ local function update_alert(player, stage)
     end
 end
 
+-- Half speed while Decrepit. Re-applied every refresh so a respawned
+-- character gets it too; reset only if this mod set it.
+local function update_speed(player, stage)
+    local character = player.character
+    if not (character and character.valid) then return end
+    storage.cravings.slowed = storage.cravings.slowed or {}
+    if stage == STAGE_DECREPIT then
+        character.character_running_speed_modifier = DECREPIT_SPEED_MODIFIER
+        storage.cravings.slowed[player.index] = true
+    elseif storage.cravings.slowed[player.index] then
+        character.character_running_speed_modifier = 0
+        storage.cravings.slowed[player.index] = nil
+    end
+end
+
 local function update_hud(player, entry, tick)
     if not (player and player.valid and player.connected and entry and entry.stage) then return end
     update_alert(player, entry.stage)
+    update_speed(player, entry.stage)
     local label = player.gui.top[HUD_NAME]
     if not (label and label.valid) then
         label = player.gui.top.add({ type = "label", name = HUD_NAME })
@@ -176,7 +196,7 @@ local function set_stage(player_index, stage, current_tick)
     end
     local prev_stage = entry.stage
     entry.stage = stage
-    if stage == STAGE_SATIATED then
+    if stage == STAGE_SATIATED or stage == STAGE_DECREPIT then
         entry.stage_ends_at = current_tick + satiated_duration_ticks()
     elseif stage == STAGE_CRAVING then
         entry.stage_ends_at = current_tick + CRAVING_TICKS
@@ -243,7 +263,7 @@ function Cravings.on_tick(event)
         if not entry then
             set_stage(player.index, STAGE_SATIATED, event.tick)
         elseif entry.stage_ends_at and event.tick >= entry.stage_ends_at then
-            if entry.stage == STAGE_SATIATED then
+            if entry.stage == STAGE_SATIATED or entry.stage == STAGE_DECREPIT then
                 set_stage(player.index, STAGE_CRAVING, event.tick)
                 player.print({ "hmfea.craving-start" })
                 Voice.say(player, "craving-start")
@@ -273,6 +293,10 @@ end
 function Cravings.on_player_used_capsule(event)
     if not (event.item and FOOD_ITEMS[event.item.name]) then return end
     local player = game.get_player(event.player_index)
+    if event.item.name == "hmfea-emergency-tea" and player and player.valid then
+        player.print({ "hmfea.emergency-tea-insult" })
+        Voice.say(player, "emergency-tea-insult")
+    end
     if RETURNS[event.item.name] then
         give_back(player, RETURNS[event.item.name])
     end
@@ -285,6 +309,12 @@ function Cravings.on_player_used_capsule(event)
                 set_stage(p.index, STAGE_SATIATED, game.tick)
             end
         end
+    end
+    -- Emergency Tea leaves the drinker Decrepit (half speed) instead of
+    -- Satiated; the insult above replaces the usual "That's better".
+    if event.item.name == "hmfea-emergency-tea" then
+        set_stage(event.player_index, STAGE_DECREPIT, game.tick)
+        return
     end
     set_stage(event.player_index, STAGE_SATIATED, game.tick)
     if player and player.valid then

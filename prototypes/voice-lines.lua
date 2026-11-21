@@ -3,6 +3,7 @@ return {
     "craving-start",
     "craven-start",
     "cravings-reset",
+    "emergency-tea-insult",
     "tower-of-london-sentenced",
     "tower-of-london-released",
     "officers-dont-run",
