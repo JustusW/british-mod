@@ -10,6 +10,37 @@ local TOL = {}
 local SENTENCE_TICKS = 60 * 60      -- 60 seconds @ 60 ticks/s
 local JAIL_GROUP_NAME = "hmfea-tower-of-london"
 
+-- Indicator while sentenced: countdown label at the top + alert-bar entry.
+local HUD_NAME = "hmfea-tower-hud"
+local HUD_COLOR = { r = 0.75, g = 0.45, b = 1.0 }
+local ALERT_ICON = { type = "item", name = "hmfea-spoiled-tea" }
+
+local function show_indicator(player, entry, tick)
+    if not (player and player.valid and player.connected) then return end
+    local label = player.gui.top[HUD_NAME]
+    if not (label and label.valid) then
+        label = player.gui.top.add({ type = "label", name = HUD_NAME })
+        label.style.font = "default-large-bold"
+        label.style.font_color = HUD_COLOR
+    end
+    label.caption = { "hmfea.tower-hud", math.max(0, math.ceil((entry.expiry - tick) / 60)) }
+    local character = player.character
+    if character and character.valid then
+        player.remove_alert({ entity = character, type = defines.alert_type.custom, icon = ALERT_ICON })
+        player.add_custom_alert(character, ALERT_ICON, { "hmfea.alert-tower" }, false)
+    end
+end
+
+local function clear_indicator(player)
+    if not (player and player.valid) then return end
+    local label = player.gui.top[HUD_NAME]
+    if label and label.valid then label.destroy() end
+    local character = player.character
+    if character and character.valid then
+        player.remove_alert({ entity = character, type = defines.alert_type.custom, icon = ALERT_ICON })
+    end
+end
+
 local function init_storage()
     storage = storage or {}
     storage.tower_of_london = storage.tower_of_london or {}
@@ -53,6 +84,7 @@ local function sentence(player, current_tick)
 
     local jail = get_or_create_jail_group()
     jail.add_player(player)
+    show_indicator(player, sentenced[player.index], current_tick)
 
     player.print({ "hmfea.tower-of-london-sentenced" })
     Voice.say(player, "tower-of-london-sentenced")
@@ -75,6 +107,7 @@ local function release(player_index)
         if target then
             target.add_player(player)
         end
+        clear_indicator(player)
         player.print({ "hmfea.tower-of-london-released" })
         Voice.say(player, "tower-of-london-released")
     end
@@ -116,6 +149,8 @@ function TOL.on_tick(event)
     for player_index, entry in pairs(sentenced) do
         if tick >= entry.expiry then
             release(player_index)
+        elseif tick % 60 == 0 then
+            show_indicator(game.get_player(player_index), entry, tick)
         end
     end
 end

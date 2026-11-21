@@ -79,7 +79,11 @@ local ALERTS = {
 local function update_alert(player, stage)
     local character = player.character
     if not (character and character.valid) then return end
-    player.remove_alert({ entity = character, type = defines.alert_type.custom })
+    -- Remove only our own craving alerts (by icon), so other features'
+    -- alerts on the character (Tower of London) survive.
+    for _, a in pairs(ALERTS) do
+        player.remove_alert({ entity = character, type = defines.alert_type.custom, icon = a.icon })
+    end
     local alert = ALERTS[stage]
     if alert then
         player.add_custom_alert(character, alert.icon, alert.message, false)
