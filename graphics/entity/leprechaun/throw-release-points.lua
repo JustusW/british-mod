@@ -1,4 +1,4 @@
--- Pot of gold at the throw release (throw sheet frame index 7, pot hidden there), per direction 0 = north, clockwise.
+-- Pot of gold at the throw release (throw sheet frame index 7; the pot is still drawn in his hand on that frame), per direction 0 = north, clockwise.
 -- Tiles relative to the entity position. ground = {x, y} under the pot (game axes, y south), height = metres above ground,
 -- screen = sprite-space offset {x, y} (what the 45 deg camera shows; y negative = up on screen).
 return

@@ -72,6 +72,8 @@ for size, s in pairs(TIERS) do
         worm.starting_attack_animation = anim("throw", s, { run_mode = "forward" })
         worm.ending_attack_animation = anim("throw", s, { run_mode = "backward" })
         worm.integration = nil  -- the hole and mound are in ingo's frames
+        -- The pot leaves his hand on the last throw frame, not at the start.
+        worm.attack_from_start_frame = false
         local ap = worm.attack_parameters
         ap.projectile_creation_parameters = release_points(s)
         local delivery = ap.ammo_type and ap.ammo_type.action and ap.ammo_type.action.action_delivery
