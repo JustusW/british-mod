@@ -47,12 +47,24 @@ if silo then
     end
 end
 
--- The rocket itself (projectile flying up) -> Union Jack rocket.
-reskin_entity("rocket-silo-rocket", "rocket-silo-rocket", "hmfea.union-jack-rocket-name", "hmfea.union-jack-rocket-description")
+-- The rocket itself -> Gerry Anderson's Fireball XL5 (Justus's pick). Art by
+-- ingo, same size and framing as vanilla's rocket-static-pod, so the vanilla
+-- layer keeps its computed shift and only the file changes. The vanilla
+-- emission glow layer is shaped for the vanilla rocket and is dropped.
+-- Model credit in credits.md.
+reskin_entity("rocket-silo-rocket", "rocket-silo-rocket", "hmfea.union-jack-rocket-name", "hmfea.union-jack-rocket-description",
+    "__hmfea__/graphics/icons/xl5-rocket.png")
+local rocket = data.raw["rocket-silo-rocket"] and data.raw["rocket-silo-rocket"]["rocket-silo-rocket"]
+if rocket and rocket.rocket_sprite and rocket.rocket_sprite.layers and rocket.rocket_sprite.layers[1] then
+    local body = rocket.rocket_sprite.layers[1]
+    body.filename = "__hmfea__/graphics/entity/xl5-rocket/xl5-rocket.png"
+    body.filenames = nil
+    body.lines_per_file = nil
+    rocket.rocket_sprite.layers = { body }
+end
 
 -- Car -> Mini Cooper. Art by ingo: 64 dir x 2 frames + shadow, scale 0.5.
--- Model credit in credits.md. The vanilla car's machine-gun turret sprite is
--- dropped (a Mini has no visible gun); the car's gun itself stays vanilla.
+-- Model credit in credits.md. The vanilla machine-gun turret stays on top.
 local MINI_ICON = "__hmfea__/graphics/icons/mini.png"
 reskin_item("car",   "hmfea.mini-cooper-name", "hmfea.mini-cooper-description", MINI_ICON)
 reskin_entity("car", "car", "hmfea.mini-cooper-name", "hmfea.mini-cooper-description", MINI_ICON)
@@ -80,7 +92,6 @@ if car then
             priority = "low",
         }),
     } }
-    car.turret_animation = nil
 end
 
 -- Tank -> Challenger / Churchill. Art by ingo: Challenger 2 hull (64 dir x
