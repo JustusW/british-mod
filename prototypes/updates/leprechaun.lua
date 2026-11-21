@@ -80,9 +80,9 @@ for size, s in pairs(TIERS) do
             local stream = data.raw.stream[delivery.stream]
             if stream then
                 stream.particle = scaled(util.sprite_load(DIR .. "pot-flying",
-                    { frame_count = 15, scale = 0.5, priority = "high" }), 1.5 * s)
+                    { frame_count = 15, scale = 0.5, priority = "high" }), s)
                 stream.shadow = scaled(util.sprite_load(DIR .. "pot-flying-shadow",
-                    { frame_count = 15, scale = 0.5, draw_as_shadow = true }), 1.5 * s)
+                    { frame_count = 15, scale = 0.5, draw_as_shadow = true }), s)
                 stream.particle_loop_frame_count = 15
                 stream.spine_animation = nil
                 stream.particle_spawn_interval = 1000  -- one pot per throw
