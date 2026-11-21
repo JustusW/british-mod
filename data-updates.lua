@@ -12,3 +12,4 @@ require("prototypes.updates.biters")
 require("prototypes.updates.rambo")  -- after biters: real art replaces the placeholder icons
 require("prototypes.updates.gentleman")
 require("prototypes.updates.tank-prereq")
+require("prototypes.icons").apply_vanilla()  -- last: Baton and Musket icons

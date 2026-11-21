@@ -28,6 +28,12 @@ Third-party assets used in _His Majesty's Factory Expansion Act_. This file ship
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), source:
   https://sketchfab.com/3d-models/4d2b89e06e124c81b40a6541f6dab94b — **modified**: rendered by ingo as the Woodchipper.
 
+## Icons
+
+The item, technology and achievement icons are renders by ingo of free 3D models, all **modified** (recoloured,
+combined or retextured). Every model, its author, source link and licence (CC0, CC BY 3.0 or CC BY 4.0) is listed in
+[`graphics/icons/ICON_CREDITS_ingo.txt`](graphics/icons/ICON_CREDITS_ingo.txt), which ships with the mod.
+
 ## Factorio assets
 
 - The Avada Kedavra bolt uses Space Age's Tesla beam sprites (`graphics/entity/tesla-beam/`), © Wube Software. Used
