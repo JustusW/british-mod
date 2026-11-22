@@ -29,7 +29,11 @@ end
 
 local function anim(name, s, opts)
     local function load(path, shadow)
-        local o = { scale = 0.5, draw_as_shadow = shadow or nil }
+        -- util.sprite_load copies only size, shift and files from the
+        -- metadata; frame and direction counts must be passed in.
+        local meta = require(DIR .. path)
+        local o = { scale = 0.5, draw_as_shadow = shadow or nil,
+            frame_count = meta.frame_count or 1, direction_count = meta.direction_count or 1 }
         for k, v in pairs(opts or {}) do o[k] = v end
         return scaled(util.sprite_load(DIR .. path, o), s)
     end
