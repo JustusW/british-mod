@@ -13,6 +13,9 @@ local util = require("util")
 
 local DIR = "__hmfea__/graphics/entity/leprechaun/"
 
+-- Drawn size on top of the vanilla worm scale.
+local SIZE = 3
+
 local TIERS = {
     small = 0.65,
     medium = 0.83,
@@ -64,7 +67,10 @@ local function coin_piles(s)
     return pics
 end
 
-for size, s in pairs(TIERS) do
+for size, tier_scale in pairs(TIERS) do
+    -- Leprechaun and pot at SIZE x the vanilla worm scale (Justus: "way too small"),
+    -- the coin piles at the puddle's own size.
+    local s = tier_scale * SIZE
     local worm = data.raw.turret[size .. "-worm-turret"]
     if worm then
         worm.folded_animation = anim("folded", s)
@@ -101,7 +107,7 @@ for size, s in pairs(TIERS) do
         end
         local fire = data.raw.fire["acid-splash-fire-worm-" .. size]
         if fire then
-            fire.pictures = coin_piles(s)
+            fire.pictures = coin_piles(tier_scale)
             fire.secondary_pictures = nil
             fire.particle_alpha = 1
         end
