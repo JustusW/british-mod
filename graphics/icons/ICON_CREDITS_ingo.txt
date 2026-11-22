@@ -26,3 +26,5 @@
 - "Round Spectacles" by Sean Buckley (Poly Haven), https://polyhaven.com/a/round_spectacles, CC0
 - "Explosion" by andersdt, https://sketchfab.com/3d-models/46fb54741fbc4cc0854c03b5ef5d0624, CC-BY 4.0
 - "101" (white flag) by Daisuke Takeoka (Poly Pizza), https://poly.pizza/m/6N4wnWe_ACN, CC-BY 3.0
+- "Train - Intercity 125 Executive Livery" by timblewee, https://sketchfab.com/3d-models/7e460c0398a0498b90402b928f3652ae, CC BY 4.0 (technology/hs2.png; track added)
+- "THSR 700T / Interior (Locomotive 01)" by Hsu.Pei.Ge, https://sketchfab.com/3d-models/42b78950675942cb871904f69006783f, CC BY 4.0 (technology/hs3.png, icons/hs3-train.png)

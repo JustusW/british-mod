@@ -19,7 +19,7 @@ local function tech(name, prereq, count, recipe)
     return {
         type = "technology",
         name = name,
-        icon = "__base__/graphics/technology/railway.png",
+        icon = "__hmfea__/graphics/technology/" .. name:gsub("^hmfea%-", "") .. ".png",  -- ingo
         icon_size = 256,
         prerequisites = { prereq },
         effects = { { type = "unlock-recipe", recipe = recipe } },
@@ -60,6 +60,12 @@ local function copy_locomotive(name, tint, recipe_factor, enabled)
 end
 
 copy_locomotive("hmfea-hs3-train", { 0.75, 0.85, 1.0, 1 }, 2, false)
+-- HS3 train icon by ingo (the entity itself only lives a second, tinted vanilla).
+for _, proto in pairs({ data.raw["item-with-entity-data"]["hmfea-hs3-train"], data.raw.locomotive["hmfea-hs3-train"] }) do
+    proto.icons = nil
+    proto.icon = "__hmfea__/graphics/icons/hs3-train.png"
+    proto.icon_size = 64
+end
 local steam = copy_locomotive("hmfea-steam-locomotive", { 0.55, 0.5, 0.45, 1 }, 1, false)
 steam.max_speed = data.raw.locomotive["locomotive"].max_speed / 2
 
