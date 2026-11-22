@@ -14,7 +14,7 @@
 --              puddle: splash damage per tick x 60), for characters and units
 --              only, as the puddle was; buildings take vanilla impact damage.
 -- Deaths: the die animation sits on the <size>-biter/-spitter-corpse; it plays
--- once (vanilla dying_speed, same frame counts as vanilla: 17 / 15) and the
+-- once (vanilla dying_speed, 15 frames, shared by biters and spitters) and the
 -- last frame stays as the corpse. No decay animation.
 local util = require("util")
 
@@ -37,12 +37,12 @@ local DISTANCE_PER_FRAME = { toddler = 0.123, child = 0.197, teen = 0.268, adult
 local DROPPED_SECONDS = 30
 
 local function dropped_weapon(age)
-    local meta = require(DIR .. "rambo-thrower/" .. age .. "/weapon-flying")
+    local meta = require(DIR .. "rambo-layered/flying/" .. age .. "/weapon-flying")
     local w, h = meta.width, meta.height
     local variations = {}
     for i = 0, 14 do
         table.insert(variations, {
-            filename = DIR .. "rambo-thrower/" .. age .. "/weapon-flying-1.png",
+            filename = DIR .. "rambo-layered/flying/" .. age .. "/weapon-flying-1.png",
             width = w, height = h, x = w * i, y = 0,
             frame_count = 1, direction_count = 1, scale = 0.5,
         })
@@ -110,22 +110,36 @@ local function weapon_instead_of_acid(stream, age)
     stream.working_sound = nil  -- the acid burn loop
 end
 
-local function rotated(path, frame_count, extra)
-    local function opts(shadow)
+-- ingo's layered Rambo (graphics/entity/rambo-layered/<anim>/): one body,
+-- shirt mask and shadow per animation, drawn at the age's body_scale; head and
+-- weapon per age at final size. Stack order body, shirt, head, weapon (ingo
+-- baked the holdouts for that order). Shirt tint per age; adult has none.
+local AGES = require(DIR .. "rambo-layered/ages")
+
+local function layered(anim, age, extra)
+    local a = AGES[age]
+    local base = DIR .. "rambo-layered/" .. anim .. "/"
+    local function load(name, scaled, opts)
+        local meta = require(base .. name)
         local o = {
-            frame_count = frame_count,
-            direction_count = 16,
-            scale = 0.5,
-            allow_forced_downscale = true,
-            draw_as_shadow = shadow or nil,
+            frame_count = meta.frame_count, direction_count = meta.direction_count or 16,
+            scale = meta.scale or 0.5, allow_forced_downscale = true,
         }
+        for k, v in pairs(opts or {}) do o[k] = v end
         for k, v in pairs(extra or {}) do o[k] = v end
-        return o
+        local layer = util.sprite_load(base .. name, o)
+        if scaled then
+            layer.scale = layer.scale * a.body_scale
+            layer.shift = { layer.shift[1] * a.body_scale, layer.shift[2] * a.body_scale }
+        end
+        return layer
     end
-    return { layers = {
-        util.sprite_load(path, opts(false)),
-        util.sprite_load(path .. "-shadow", opts(true)),
-    } }
+    local layers = { load("body", true) }
+    if a.shirt_tint then table.insert(layers, load("shirt", true, { tint = a.shirt_tint })) end
+    table.insert(layers, load("head-" .. age, false))
+    table.insert(layers, load("weapon-" .. age, false))
+    table.insert(layers, load("shadow", true, { draw_as_shadow = true }))
+    return { layers = layers }
 end
 
 -- Thrower attack, frames 1-14: 1-6 into the stance, 7 ready, 8-14 the throw,
@@ -149,17 +163,17 @@ local THROW_SEQUENCE = {
 }
 local THROW_WARMUP_TICKS = 30
 
-local function set_death(unit, path, frames)
+local function set_death(unit, age)
     local corpse = unit and unit.corpse and data.raw.corpse[unit.corpse]
     if not corpse then return end
-    corpse.animation = rotated(path, frames)
+    corpse.animation = layered("death", age)
     corpse.decay_animation = nil
     corpse.use_decay_layer = false
 end
 
 -- ingo's release points are hr pixels (64 px/tile) for directions 0..15.
 local function release_points(age)
-    local points = require(DIR .. "rambo-thrower/" .. age .. "/release-points")
+    local points = require(DIR .. "rambo-layered/throw/release-points-" .. age)
     local params = {}
     for i, p in ipairs(points) do
         table.insert(params, { 0.0625 * (i - 1), { p[1] / 64, p[2] / 64 } })
@@ -169,29 +183,28 @@ end
 
 for _, tier in ipairs(TIERS) do
     local age = tier.age
-    local run_path = DIR .. "rambo/" .. age .. "/rambo-run"
 
     -- Melee: <size>-biter
     local biter = data.raw.unit[tier.size .. "-biter"]
     if biter then
-        biter.run_animation = rotated(run_path, 16)
+        biter.run_animation = layered("run", age)
         biter.distance_per_frame = DISTANCE_PER_FRAME[age]
         biter.attack_parameters.animation =
-            rotated(DIR .. "rambo/" .. age .. "/rambo-attack", 11, { animation_speed = 0.4 })
-        set_death(biter, DIR .. "rambo/" .. age .. "/rambo-die", 17)
+            layered("club", age, { animation_speed = 0.4 })
+        set_death(biter, age)
     end
 
     -- Thrower: <size>-spitter
     local spitter = data.raw.unit[tier.size .. "-spitter"]
     if spitter then
-        spitter.run_animation = rotated(run_path, 16)
+        spitter.run_animation = layered("run", age)
         spitter.distance_per_frame = DISTANCE_PER_FRAME[age]
         spitter.alternative_attacking_frame_sequence = THROW_SEQUENCE
         local ap = spitter.attack_parameters
-        ap.animation = rotated(DIR .. "rambo-thrower/" .. age .. "/rambo-attack", 14)
+        ap.animation = layered("throw", age)
         ap.warmup = THROW_WARMUP_TICKS
         ap.projectile_creation_parameters = release_points(age)
-        set_death(spitter, DIR .. "rambo-thrower/" .. age .. "/rambo-die", 15)
+        set_death(spitter, age)
 
         -- The stream this spitter fires: one tumbling weapon instead of a
         -- jet of acid blobs; it lands on the floor instead of an acid puddle.
@@ -200,7 +213,7 @@ for _, tier in ipairs(TIERS) do
             and ap.ammo_type.action.action_delivery.stream
         local stream = stream_name and data.raw.stream[stream_name]
         if stream then
-            stream.particle = util.sprite_load(DIR .. "rambo-thrower/" .. age .. "/weapon-flying", {
+            stream.particle = util.sprite_load(DIR .. "rambo-layered/flying/" .. age .. "/weapon-flying", {
                 frame_count = 15,
                 scale = 0.5,
                 priority = "high",
