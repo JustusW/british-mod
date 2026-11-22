@@ -24,4 +24,11 @@ return {
     "research-philosophers-stone",
     "research-truthbomb",
     "research-mr-blobby",
+    "research-hs1",
+    "research-hs2-started",
+    "research-hs2",
+    "research-hs3",
+    "hs3-explodes",
+    "steam-first",
+    "northern-leg",
 }
