@@ -35,7 +35,7 @@ local function anim(name, s, opts)
         -- util.sprite_load copies only size, shift and files from the
         -- metadata; frame and direction counts must be passed in.
         local meta = require(DIR .. path)
-        local o = { scale = 0.5, draw_as_shadow = shadow or nil,
+        local o = { scale = meta.scale or 0.5, draw_as_shadow = shadow or nil,
             frame_count = meta.frame_count or 1, direction_count = meta.direction_count or 1 }
         for k, v in pairs(opts or {}) do o[k] = v end
         return scaled(util.sprite_load(DIR .. path, o), s)
@@ -61,7 +61,7 @@ local function coin_piles(s)
             filename = DIR .. "coin-pile-" .. i .. ".png",
             width = meta.width, height = meta.height,
             shift = { meta.shift[1] * s, meta.shift[2] * s },
-            frame_count = 1, scale = 0.5 * s,
+            frame_count = 1, scale = (meta.scale or 0.5) * s,
         })
     end
     return pics
@@ -92,9 +92,9 @@ for size, tier_scale in pairs(TIERS) do
             local stream = data.raw.stream[delivery.stream]
             if stream then
                 stream.particle = scaled(util.sprite_load(DIR .. "pot-flying",
-                    { frame_count = 15, scale = 0.5, priority = "high" }), s)
+                    { frame_count = 15, scale = require(DIR .. "pot-flying").scale or 0.5, priority = "high" }), s)
                 stream.shadow = scaled(util.sprite_load(DIR .. "pot-flying-shadow",
-                    { frame_count = 15, scale = 0.5, draw_as_shadow = true }), s)
+                    { frame_count = 15, scale = require(DIR .. "pot-flying-shadow").scale or 0.5, draw_as_shadow = true }), s)
                 stream.particle_loop_frame_count = 15
                 stream.spine_animation = nil
                 stream.particle_spawn_interval = 1000  -- one pot per throw
