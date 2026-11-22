@@ -4,11 +4,12 @@ Date: 2026-11-22
   Major:
     - First release. The colony runs on tea: every engineer goes from Satiated to Craving to Craven, and a Craven engineer stops the whole factory until somebody eats. Cuppa Tea (hand-crafted, spoils, sends you to the Tower of London when it goes off), Fish & Chips, and Emergency Teatime from ten wood when all else fails.
     - Mr. Blobby is the only way to win. Turn him off in the settings and you are a Whimp.
+    - British high-speed rail: High Speed 1 gives you no locomotive, High Speed 2 gives you two, and High Speed 3 gives you a train that explodes. You'll make do with steam. Every locomotive wants its cup of tea, or it goes on strike.
     - The enemy is Rambo: biters club you with their weapon, spitters throw it, nests are EU Buildings and Barrack Tents, and worms are Irish Leprechauns throwing pots of gold. Every dead enemy leaves an EU Flag that blocks building and takes thirty seconds to pull out by hand.
   Features:
     - The engineer is a gentleman in suit, monocle and top hat, with a cane.
     - Teacups are fired in the furnace and break when you drink on the move. The shards are yours to keep.
     - Longbow, Musket, Batons, the Truthbomb bus, and three spells behind the Wand.
     - The Mini, the Challenger with the national anthem, the EU HQ silo and the Fireball XL5 rocket.
-    - A Black Country voice for every warning, and a British one-liner for every research.
+    - A Black Country voice for every warning, and a British one-liner for each of the mod's research.
     - Every language is English.
