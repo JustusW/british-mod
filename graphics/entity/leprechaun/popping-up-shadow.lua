@@ -1,13 +1,13 @@
 return
 {
-  width = 199,
-  height = 94,
-  shift = util.by_pixel(22.92, 3.4),
-  line_length = 8,
-  lines_per_file = 43,
-  frame_count = 8,
+  width = 394,
+  height = 184,
+  shift = util.by_pixel(22.81, 3.65),
+  line_length = 10,
+  lines_per_file = 22,
+  frame_count = 24,
   direction_count = 1,
   draw_as_shadow = true,
-  scale = 0.5,
+  scale = 0.25,
   filenames = { "-1.png" },
 }

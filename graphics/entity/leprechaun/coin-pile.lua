@@ -1,7 +1,7 @@
 return
 {
-  width = 74,
-  height = 56,
+  width = 146,
+  height = 108,
   shift = util.by_pixel( 0.09, -0.24),
   line_length = 1,
   filenames =
@@ -12,5 +12,5 @@ return
     "-4.png",
   },
   lines_per_file = 1,
-  scale = 0.5,
+  scale = 0.25,
 }

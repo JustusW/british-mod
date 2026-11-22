@@ -1,15 +1,16 @@
 return
 {
-  width = 114,
-  height = 132,
-  shift = util.by_pixel( 0.0, -19.63),
-  line_length = 8,
+  width = 224,
+  height = 258,
+  shift = util.by_pixel( 0.0, -19.62),
+  line_length = 16,
   filenames =
   {
     "-1.png",
+    "-2.png",
   },
-  lines_per_file = 16,
-  frame_count = 8,
+  lines_per_file = 8,
+  frame_count = 16,
   direction_count = 16,
-  scale = 0.5,
+  scale = 0.25,
 }
