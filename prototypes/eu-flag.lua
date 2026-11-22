@@ -1,4 +1,4 @@
--- EU Flag entity. Dropped by biters / spitters on death. Mined by hand only
+-- EU Flag entity. Dropped by biters / spitters / worms on death. Mined by hand only
 -- — the "not-deconstructable" entity flag stops the deconstruction planner
 -- from accepting the flag, which means no order is ever raised and no robot
 -- is dispatched. Hand-mining via the regular mine input is unaffected.
@@ -31,9 +31,10 @@ for tier = 1, TIER_COUNT do
         flags = { "placeable-neutral", "not-rotatable", "not-on-map", "not-deconstructable" },
         max_health = 100,
         collision_box = { { -0.3 * scale * 2, -0.3 * scale * 2 }, { 0.3 * scale * 2, 0.3 * scale * 2 } },
-        -- Collides with nothing: a fight's worth of dropped flags must not
-        -- wall the player in. Still selectable and hand-minable.
-        collision_mask = { layers = {} },
+        -- Blocks building placement (buildings, belts and rails carry the
+        -- "object" layer), but characters, vehicles, biters and trains don't
+        -- collide with "object": a fight's flags never wall the player in.
+        collision_mask = { layers = { object = true } },
         selection_box = { { -0.5 * scale * 2, -0.5 * scale * 2 }, { 0.5 * scale * 2, 0.5 * scale * 2 } },
         minable = {
             mining_time = mining_time,

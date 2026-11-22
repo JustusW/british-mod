@@ -1,4 +1,4 @@
--- EU Flag drops on biter / spitter death. Robot mining is blocked by the
+-- EU Flag drops on biter / spitter / worm death. Robot mining is blocked by the
 -- "not-deconstructable" entity-prototype flag (see prototypes/eu-flag.lua) —
 -- the deconstruction planner refuses to mark the flag, so no robot is ever
 -- dispatched. Players who hand-mine a flag in under 30 seconds (i.e. with
@@ -19,6 +19,8 @@ local MINING_SLACK_TICKS = 30
 local BITER_NAMES = {
     ["small-biter"] = true, ["medium-biter"] = true, ["big-biter"] = true, ["behemoth-biter"] = true,
     ["small-spitter"] = true, ["medium-spitter"] = true, ["big-spitter"] = true, ["behemoth-spitter"] = true,
+    -- Worms (leprechauns) drop one too (Justus 2026-11-22).
+    ["small-worm-turret"] = true, ["medium-worm-turret"] = true, ["big-worm-turret"] = true, ["behemoth-worm-turret"] = true,
 }
 
 local function flag_name_for_tier(tier)
