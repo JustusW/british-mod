@@ -13,6 +13,9 @@ local LINES = {
     ["hmfea-philosophers-stone"] = "philosophers-stone",
     ["hmfea-truthbomb"] = "truthbomb",
     ["hmfea-mr-blobby"] = "mr-blobby",
+    ["railway"] = "hs1",
+    ["hmfea-hs2"] = "hs2",
+    ["hmfea-hs3"] = "hs3",
 }
 
 function ResearchLines.on_research_finished(event)
