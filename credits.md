@@ -41,7 +41,7 @@ the **public domain**.
 ## Tank anthem
 
 `sound/god-save-the-king.ogg` is a cut of England fans singing "God Save the King" at MetLife Stadium (FIFA World Cup
-2026), originally posted on Twitter/X and released by its author without restrictions; source video:
+2026), recorded and originally posted on Twitter/X by Phil Clarke, released without restrictions and used with his permission; source video:
 https://www.youtube.com/watch?v=coo1dzoN8SE. Trimmed to one verse, mono, loudness-normalised.
 
 ## Truthbomb line
