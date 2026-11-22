@@ -11,6 +11,7 @@ require("prototypes.updates.vehicles")
 require("prototypes.updates.biters")
 require("prototypes.updates.rambo")  -- after biters: real art replaces the placeholder icons
 require("prototypes.updates.leprechaun")  -- worms as leprechauns (ingo)
+require("prototypes.updates.tea-train")  -- locomotives need tea
 require("prototypes.updates.gentleman")
 require("prototypes.updates.tank-prereq")
 -- Victory jingle replaced (ASSETS A3).
