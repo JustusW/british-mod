@@ -66,8 +66,33 @@ for _, proto in pairs({ data.raw["item-with-entity-data"]["hmfea-hs3-train"], da
     proto.icon = "__hmfea__/graphics/icons/hs3-train.png"
     proto.icon_size = 64
 end
-local steam = copy_locomotive("hmfea-steam-locomotive", { 0.55, 0.5, 0.45, 1 }, 1, false)
+local steam = copy_locomotive("hmfea-steam-locomotive", nil, 1, false)
 steam.max_speed = data.raw.locomotive["locomotive"].max_speed / 2
+
+-- ingo's Flying Scotsman (A3, no tender): body only, it rides on the vanilla
+-- wheels (Justus: "use the game wheels, I want them turning"); the green paint
+-- is the colour mask (Justus: "make sure the green part can be recolored").
+local STEAM = "__hmfea__/graphics/entity/steam-locomotive/steam-locomotive"
+local function steam_layer(suffix, extra)
+    local o = { dice = 4, priority = "very-low", allow_low_quality_rotation = true,
+        direction_count = 256, scale = 0.5, usage = "train" }
+    for k, v in pairs(extra or {}) do o[k] = v end
+    return util.sprite_load(STEAM .. suffix, o)
+end
+steam.pictures = { rotated = { layers = {
+    steam_layer(""),
+    steam_layer("-mask", { flags = { "mask" }, apply_runtime_tint = true, tint_as_overlay = true }),
+    steam_layer("-shadow", { flags = { "shadow" }, draw_as_shadow = true }),
+} } }
+steam.color = { r = 0.25, g = 0.42, b = 0.18, a = 1 }  -- LNER green
+steam.icon = "__hmfea__/graphics/icons/steam-locomotive.png"
+steam.icon_size = 64
+steam.icons = nil
+for _, smoke in pairs(steam.energy_source.smoke or {}) do smoke.position = { 0, -2.22 } end  -- chimney
+local steam_item = data.raw["item-with-entity-data"]["hmfea-steam-locomotive"]
+steam_item.icon = "__hmfea__/graphics/icons/steam-locomotive.png"
+steam_item.icon_size = 64
+steam_item.icons = nil
 
 data:extend({
     tech("hmfea-hs2", "railway", 150, "locomotive"),

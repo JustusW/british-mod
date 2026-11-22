@@ -28,3 +28,4 @@
 - "101" (white flag) by Daisuke Takeoka (Poly Pizza), https://poly.pizza/m/6N4wnWe_ACN, CC-BY 3.0
 - "Train - Intercity 125 Executive Livery" by timblewee, https://sketchfab.com/3d-models/7e460c0398a0498b90402b928f3652ae, CC BY 4.0 (technology/hs2.png; track added)
 - "THSR 700T / Interior (Locomotive 01)" by Hsu.Pei.Ge, https://sketchfab.com/3d-models/42b78950675942cb871904f69006783f, CC BY 4.0 (technology/hs3.png, icons/hs3-train.png)
+- "Train - Class A3 Flying Scotsman" by timblewee, https://sketchfab.com/3d-models/de506bc7c0fb4a93a25203932a5e080e, CC BY 4.0, modified (tender and running gear removed, paint recolourable; icons/steam-locomotive.png, entity/steam-locomotive/)
